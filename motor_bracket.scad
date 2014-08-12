@@ -19,10 +19,12 @@
 
 include <configuration.scad>
 
-//motor_bracket_lower_decker($fn=64);
+REVERT = true;
+
+motor_bracket_lower_decker($fn=64);
 
 //translate([14,0, 2*WALL_WIDTH +BEARING_WIDTH])
-motor_bracket_upper_decker($fn=64);
+//motor_bracket_upper_decker($fn=64);
 
 module motor_bracket_upper_decker(
     lwall=LIGHT_WALL_WIDTH,
@@ -124,7 +126,8 @@ module motor_bracket_lower_decker(
     bearing_screw_nut_width=BEARING_SCREW_NUT_WIDTH,
     bearing_width=BEARING_WIDTH,
     motor_support_screw_r=MOTOR_SUPPORT_SCREW_DIAMETER/2,
-    motor_support_screws_d=MOTOR_SUPPORT_SCREWS_DISTANCE)
+    motor_support_screws_d=MOTOR_SUPPORT_SCREWS_DISTANCE,
+    revert=REVERT)
 {
   screws_distance = 2*bearing_r/cos(45);
   w = 2*bearing_screw_r + 2*wall;
@@ -138,13 +141,24 @@ module motor_bracket_lower_decker(
         translate([-ST, -w/2, 0])
           cube([screws_distance/2 + ST, w, h]);
       }
-      translate([-motor_support_screws_d/sqrt(2) + screws_distance/2, 0, 0])
-        for (a=[0,180]) rotate([0,0,a])
-      {
-        translate([-w_supp/2, 0, 0])
-          cube([w_supp, motor_support_screws_d/sqrt(2), h]);
-        translate([0, motor_support_screws_d/sqrt(2), 0])
-          cylinder(r=w_supp/2, h=h);
+      if (!revert) {
+        translate([-motor_support_screws_d/sqrt(2) + screws_distance/2, 0, 0])
+          for (a=[0,180]) rotate([0,0,a])
+        {
+          translate([-w_supp/2, 0, 0])
+            cube([w_supp, motor_support_screws_d/sqrt(2), h]);
+          translate([0, motor_support_screws_d/sqrt(2), 0])
+            cylinder(r=w_supp/2, h=h);
+        }
+      } else {
+        translate([motor_support_screws_d/sqrt(2) - screws_distance/2, 0, 0])
+          for (a=[0,180]) rotate([0,0,a])
+        {
+          translate([-w_supp/2, 0, 0])
+            cube([w_supp, motor_support_screws_d/sqrt(2), h]);
+          translate([0, motor_support_screws_d/sqrt(2), 0])
+            cylinder(r=w_supp/2, h=h);
+        }
       }
       translate([screws_distance/2, 0, 0])
         cylinder(r=w/2, h=h);
@@ -156,11 +170,20 @@ module motor_bracket_lower_decker(
     }
     translate([screws_distance/2, 0, -1])
       #cylinder(r=bearing_screw_r, h=h+bearing_width +2);
-    translate([-motor_support_screws_d/sqrt(2) + screws_distance/2, 0, 0])
-      for (a=[0,180]) rotate([0,0,a])
-    {
-      translate([0, motor_support_screws_d/sqrt(2), -1])
-        #cylinder(r=motor_support_screw_r, h=h+2);
+    if (!revert) {
+      translate([-motor_support_screws_d/sqrt(2) + screws_distance/2, 0, 0])
+        for (a=[0,180]) rotate([0,0,a])
+      {
+        translate([0, motor_support_screws_d/sqrt(2), -1])
+          #cylinder(r=motor_support_screw_r, h=h+2);
+      }
+    } else {
+      translate([motor_support_screws_d/sqrt(2) - screws_distance/2, 0, 0])
+        for (a=[0,180]) rotate([0,0,a])
+      {
+        translate([0, motor_support_screws_d/sqrt(2), -1])
+          #cylinder(r=motor_support_screw_r, h=h+2);
+      }
     }
 
     translate([-screws_distance/2, 0, -1])
