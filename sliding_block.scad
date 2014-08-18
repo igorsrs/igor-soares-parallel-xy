@@ -19,43 +19,60 @@
 
 include <configuration.scad>
 
-sliding_block_bushing_clamp($fn=64);
+sliding_block_rod_clamp($fn=64);
 
 module sliding_block_rod_clamp(
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
     rod_r=ROD_HOLE_DIAMETER/2,
     bearing_pos=INNER_BEARING_SCREW_DISTANCE_TO_ROD,
-    bearing_r=BEARING_SCREW_DIAMETER/2,
+    bearing_r=BEARING_DIAMETER/2,
+    bearing_screw_r=BEARING_SCREW_DIAMETER/2,
+    bearing_screw_rod_d=INNER_BEARING_SCREW_DISTANCE_TO_ROD,
     screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
-    bushing_l=LINEAR_BUSHING_LEN)
+    bushing_l=LINEAR_BUSHING_LEN,
+    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
+    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5)
 {
   h=rod_r + lwall;
+
+  wire_h_pos = lwall - (wire_h + (rod_r - bushing_r));
+
+  bearing_pos = (rod_r + bearing_screw_rod_d + bearing_screw_r) - 2*bearing_r;
+
+  screws_y_dist = bushing_r + screw_r + ST;
+  wire_y_pos = bearing_pos + wire_pos_from_bearing_center;
+  left_pos = min(bearing_pos + wire_pos_from_bearing_center,
+                 -screws_y_dist - screw_r - lwall);
 
   screws_x_dist = 2*rod_r + 2*screw_r + ST;
   x_len = screws_x_dist + 2*screw_r + 2*lwall;
 
-  screws_y_dist = 2*bushing_r + 2*screw_r + ST;
-  y_len = screws_y_dist + 2*screw_r + 2*lwall;
+  y_len = screws_y_dist + screw_r + lwall - left_pos;
 
   screw_pos = [ -x_len/2 + lwall + screw_r, lwall + screw_r];
 
   difference() {
     union() {
-      translate([-x_len/2, 0, 0])
+      translate([-x_len/2, left_pos, 0])
         cube([x_len, y_len, h]);
+      translate([-x_len/2, wire_y_pos, wire_h_pos])
+        cube([x_len, wall, h]);
     }
     //rod
-    translate([0, -1, lwall + rod_r]) rotate([-90,0,0])
+    translate([0, left_pos -1, lwall + rod_r]) rotate([-90,0,0])
       #cylinder(r=rod_r, h=y_len +2);
 
     //screws
-    for (f=[ [0,0], [1,0], [0,1], [1,1] ])
+    for (f=[ [0,-1], [1,-1], [0,1], [1,1] ])
       translate([screw_pos[0] + f[0]*screws_x_dist,
-                 screw_pos[1] + f[1]*screws_y_dist,
+                 f[1]*screws_y_dist,
                  -1])
         #cylinder(r=screw_r, h=h+2);
+
+      translate([-x_len/2 -1, wire_y_pos, wire_h_pos]) rotate([0,90,0])
+        #cylinder(r=1, h=x_len +2);
   }
 }
 
