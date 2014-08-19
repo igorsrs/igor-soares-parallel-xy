@@ -21,6 +21,57 @@ include <configuration.scad>
 
 sliding_block_rod_clamp($fn=64);
 
+module wire_guide(
+        wall=1,
+        lwall=1,
+        hsupp=-0.1,
+        vsupp = 0.5,
+        screw_r=1,
+        screw_head_r=1,
+        h=10)
+{
+  difference() {
+    union() {
+      translate([- wall, - wall, h+ wall])
+        rotate([-90,0,0])
+        cylinder(r=wall, h=3*wall);
+      translate([-2*wall, - wall, 0])
+        cube([2*wall + lwall, wall, h + wall]);
+      translate([-2*wall, wall, 0])
+        cube([2*wall + lwall, wall, h + wall]);
+
+      translate([- wall - screw_head_r, 0, 0]) difference() {
+        union() {
+          translate([0, -screw_head_r - vsupp, 0])
+            cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
+          translate([-screw_head_r - vsupp, -screw_head_r - vsupp, h + wall])
+            cube([2*(screw_head_r + vsupp),
+                  2*screw_head_r + wall + 2*vsupp,
+                  wall]);
+          translate([0, screw_head_r +wall + vsupp, 0])
+            cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
+        }
+        translate([-screw_head_r - vsupp - ST, -screw_head_r, -1])
+          #cube([2*(screw_head_r + vsupp) - vsupp,
+                 2*screw_head_r + wall,
+                 h + wall +1]);
+      }
+    }
+    translate([- wall - screw_head_r, - screw_head_r - vsupp + ST, -1])
+      #cylinder(r=screw_head_r, h=h + wall +1);
+    translate([- wall - screw_head_r, screw_head_r +wall + vsupp -ST, -1])
+      #cylinder(r=screw_head_r, h=h + wall +1);
+
+    translate([- wall - screw_head_r,
+               - screw_head_r -vsupp + ST,
+               h + wall + hsupp])
+      #cylinder(r=screw_r, h=wall +1);
+    translate([- wall - screw_head_r,
+               screw_head_r +wall +vsupp -ST,
+               h + wall + hsupp])
+      #cylinder(r=screw_r, h=wall +1);
+  }
+}
 module sliding_block_rod_clamp(
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
@@ -30,14 +81,16 @@ module sliding_block_rod_clamp(
     bearing_screw_r=BEARING_SCREW_DIAMETER/2,
     bearing_screw_rod_d=INNER_BEARING_SCREW_DISTANCE_TO_ROD,
     screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
+    screw_head_r=12.0/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5)
+    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5,
+    wire_hole=LIGHT_WALL_WIDTH)
 {
   h=rod_r + lwall;
 
-  wire_h_pos = lwall - (wire_h + (rod_r - bushing_r));
+  wire_h_pos = rod_r + (wire_h + (rod_r - bushing_r));
 
   bearing_pos = (rod_r + bearing_screw_rod_d + bearing_screw_r) - 2*bearing_r;
 
@@ -57,11 +110,13 @@ module sliding_block_rod_clamp(
     union() {
       translate([-x_len/2, left_pos, 0])
         cube([x_len, y_len, h]);
-      translate([-x_len/2, wire_y_pos, wire_h_pos])
-        cube([x_len, wall, h]);
+
+      translate([-x_len/2, wire_y_pos, 0])
+        wire_guide(wall=wall, lwall=lwall, h=wire_h_pos,
+                   screw_r=screw_r, screw_head_r=screw_head_r);
     }
     //rod
-    translate([0, left_pos -1, lwall + rod_r]) rotate([-90,0,0])
+    translate([0, left_pos -1, 0]) rotate([-90,0,0])
       #cylinder(r=rod_r, h=y_len +2);
 
     //screws
@@ -71,8 +126,9 @@ module sliding_block_rod_clamp(
                  -1])
         #cylinder(r=screw_r, h=h+2);
 
-      translate([-x_len/2 -1, wire_y_pos, wire_h_pos]) rotate([0,90,0])
-        #cylinder(r=1, h=x_len +2);
+      translate([-x_len/2 -1, wire_y_pos - ST, wire_h_pos])
+        rotate([0,90,0])
+          #cylinder(r=wire_hole/2, h=x_len);
   }
 }
 
