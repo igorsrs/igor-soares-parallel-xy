@@ -28,48 +28,55 @@ module wire_guide(
         vsupp = 0.5,
         screw_r=1,
         screw_head_r=1,
+        x_pos=1,
         h=10)
 {
-  difference() {
-    union() {
-      translate([- wall, - wall, h+ wall])
-        rotate([-90,0,0])
-        cylinder(r=wall, h=3*wall);
-      translate([-2*wall, - wall, 0])
-        cube([2*wall + lwall, wall, h + wall]);
-      translate([-2*wall, wall, 0])
-        cube([2*wall + lwall, wall, h + wall]);
+  l = -2*x_pos + 2*wall;
 
-      translate([- wall - screw_head_r, 0, 0]) difference() {
-        union() {
-          translate([0, -screw_head_r - vsupp, 0])
-            cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
-          translate([-screw_head_r - vsupp, -screw_head_r - vsupp, h + wall])
-            cube([2*(screw_head_r + vsupp),
-                  2*screw_head_r + wall + 2*vsupp,
-                  wall]);
-          translate([0, screw_head_r +wall + vsupp, 0])
-            cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
+  union() {
+    for (i=[0,1]) mirror([i,0,0]) translate([x_pos + wall, -lwall/2,0])
+        difference()
+    {
+      union() {
+        translate([- wall, - wall, h+ wall])
+          rotate([-90,0,0])
+          cylinder(r=wall, h=3*wall);
+        translate([-2*wall, - wall, 0])
+          cube([l/2 + ST, wall, h + 2*wall]);
+        translate([-2*wall, wall, 0])
+          cube([l/2 + ST, wall, h + 2*wall]);
+
+        translate([- wall - screw_head_r, 0, 0]) difference() {
+          union() {
+            translate([0, -screw_head_r - vsupp, 0])
+              cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
+            translate([-screw_head_r - vsupp, -screw_head_r - vsupp, h + wall])
+              cube([2*(screw_head_r + vsupp),
+                    2*screw_head_r + wall + 2*vsupp,
+                    wall]);
+            translate([0, screw_head_r +wall + vsupp, 0])
+              cylinder(r=screw_head_r + vsupp, h=h + 2*wall);
+          }
+          translate([-screw_head_r - vsupp - ST, -screw_head_r, -1])
+            #cube([2*(screw_head_r + vsupp) - vsupp,
+                   2*screw_head_r + wall,
+                   h + wall +1]);
         }
-        translate([-screw_head_r - vsupp - ST, -screw_head_r, -1])
-          #cube([2*(screw_head_r + vsupp) - vsupp,
-                 2*screw_head_r + wall,
-                 h + wall +1]);
       }
-    }
-    translate([- wall - screw_head_r, - screw_head_r - vsupp + ST, -1])
-      #cylinder(r=screw_head_r, h=h + wall +1);
-    translate([- wall - screw_head_r, screw_head_r +wall + vsupp -ST, -1])
-      #cylinder(r=screw_head_r, h=h + wall +1);
+      translate([- wall - screw_head_r, - screw_head_r - vsupp + ST, -1])
+        #cylinder(r=screw_head_r, h=h + wall +1);
+      translate([- wall - screw_head_r, screw_head_r +wall + vsupp -ST, -1])
+        #cylinder(r=screw_head_r, h=h + wall +1);
 
-    translate([- wall - screw_head_r,
-               - screw_head_r -vsupp + ST,
-               h + wall + hsupp])
-      #cylinder(r=screw_r, h=wall +1);
-    translate([- wall - screw_head_r,
-               screw_head_r +wall +vsupp -ST,
-               h + wall + hsupp])
-      #cylinder(r=screw_r, h=wall +1);
+      translate([- wall - screw_head_r,
+                 - screw_head_r -vsupp + ST,
+                 h + wall + hsupp])
+        #cylinder(r=screw_r, h=wall +1);
+      translate([- wall - screw_head_r,
+                 screw_head_r +wall +vsupp -ST,
+                 h + wall + hsupp])
+        #cylinder(r=screw_r, h=wall +1);
+    }
   }
 }
 module sliding_block_rod_clamp(
@@ -111,8 +118,9 @@ module sliding_block_rod_clamp(
       translate([-x_len/2, left_pos, 0])
         cube([x_len, y_len, h]);
 
-      translate([-x_len/2, wire_y_pos, 0])
+      translate([0, wire_y_pos, 0])
         wire_guide(wall=wall, lwall=lwall, h=wire_h_pos,
+                   x_pos=screw_pos[0] - screw_head_r,
                    screw_r=screw_r, screw_head_r=screw_head_r);
     }
     //rod
@@ -124,7 +132,11 @@ module sliding_block_rod_clamp(
       translate([screw_pos[0] + f[0]*screws_x_dist,
                  f[1]*screws_y_dist,
                  -1])
+      {
         #cylinder(r=screw_r, h=h+2);
+        translate([0,0,rod_r + lwall +1 + ST])
+          #cylinder(r=screw_head_r, h=2*wall +1);
+      }
 
       translate([-x_len/2 -1, wire_y_pos - ST, wire_h_pos])
         rotate([0,90,0])
