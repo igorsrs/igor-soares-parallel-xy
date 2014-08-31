@@ -54,7 +54,7 @@ sliding_block_rod_clamp(
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
-//if(false)
+if(false)
 rotate([180,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -62,6 +62,9 @@ sliding_block_rod_clamp(
     wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
+
+//if(false)
+wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
@@ -320,4 +323,41 @@ union() {
   translate([x_len/2 - vsupp, 0, (h - lwall)])
     cube([vsupp, y_len, wire_h_pos + wire_hole + wall - (h - lwall)]);
 }
+}
+
+module wire_spool(
+    wall=WALL_WIDTH,
+    lwall=LIGHT_WALL_WIDTH,
+    hsupp=HORIZONTAL_SUPPORT_WALL,
+    vsupp=VERTICAL_SUPPORT_WALL,
+    rod_r=ROD_HOLE_DIAMETER/2,
+    screw_r=5.0/2,
+    screw_head_r=5.7)
+{
+  l = lwall+ rod_r + screw_r + screw_head_r + wall;
+  union() {
+    difference() {
+      union() {
+        translate([-l, -wall, wall/2]) rotate([0,90,0]) {
+          cylinder(r=wall/2, h=2*l);
+          translate([-wall/2, 0, 0])
+            cube([wall, wall, 2*l]);
+          translate([0, wall, 0])
+            cylinder(r=wall/2, h=2*l);
+        }
+        for (i=[-1,1]) translate([i*l, 0, 0]) {
+            cylinder(r=screw_r + wall, h=wall);
+            mirror([0,1,0]) translate([-screw_r - wall, 0, 0])
+              cube([2*(screw_r+ wall), wall + screw_r, wall]);
+        }
+        translate([-wall , -wall/2, ST])
+          cylinder(r1=wall/2, r2=1.5*wall/2, h=wall+ lwall);
+      }
+      for (i=[-1,1]) translate([i*l, 0, -1]) {
+          #cylinder(r=screw_r, h=wall +2);
+          mirror([0,1,0]) translate([-screw_r, 0, 0])
+            #cube([2*screw_r, wall + screw_r +1, wall+2]);
+      }
+    }
+  }
 }
