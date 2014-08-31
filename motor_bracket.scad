@@ -164,9 +164,8 @@ module motor_bracket_lower_decker(
         cylinder(r=w/2, h=h);
 
       translate([-screws_distance/2, 0, 0])
-        cylinder(r=bearing_screw_nut_width/sqrt(3)+ wall,
-                 h=h + bearing_width,
-                 $fn=6);
+        cylinder(r=bearing_screw_r+ wall,
+                 h=h);
     }
     translate([screws_distance/2, 0, -1])
       #cylinder(r=bearing_screw_r, h=h+bearing_width +2);
@@ -187,10 +186,7 @@ module motor_bracket_lower_decker(
     }
 
     translate([-screws_distance/2, 0, -1])
-      #cylinder(r=bearing_screw_nut_width/sqrt(3), h=bearing_width +1, $fn=6);
-
-    translate([-screws_distance/2, 0, bearing_width + hsupp])
-      #cylinder(r=bearing_screw_r, h=h +1);
+      #cylinder(r=bearing_screw_r, h=h +2);
   }
 }
 
