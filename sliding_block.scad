@@ -19,16 +19,45 @@
 
 include <configuration.scad>
 
+if(false)
 rotate([180,0,0])
 sliding_block_bushing_clamp(
+    wire_clamp=false,
+    $fn=64);
+if(false)
+rotate([180,0,0])
+sliding_block_bushing_clamp(
+    wire_clamp=true,
     $fn=64,
     wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
+);
+if(false)
+rotate([180,0,0])
+sliding_block_bushing_clamp(
+    wire_clamp=true,
+    $fn=64,
+    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
 );
 
 if(false)
 rotate([180,0,0])
 sliding_block_rod_clamp(
+    wire_clamp=false,
+    $fn=64);
+if(false)
+rotate([180,0,0])
+sliding_block_rod_clamp(
+    wire_clamp=true,
+    $fn=64,
+    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
+    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+);
+//if(false)
+rotate([180,0,0])
+sliding_block_rod_clamp(
+    wire_clamp=true,
     $fn=64,
     wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
@@ -66,6 +95,7 @@ module wire_guide(
   }
 }
 module sliding_block_rod_clamp(
+    wire_clamp=false,
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
     hsupp=HORIZONTAL_SUPPORT_WALL,
@@ -107,6 +137,7 @@ union() {
       translate([-x_len/2, left_pos, 0])
         cube([x_len, y_len, h]);
 
+      if(wire_clamp)
       for(i=[0,1]) mirror([i,0,0])
         translate([-screw_pos[0], 0 ,0 ])
           wire_guide(wall=wall, lwall=lwall, h=wire_h_pos,
@@ -127,11 +158,16 @@ union() {
                  f[1]*screws_y_dist,
                  -1])
       {
+        if (wire_clamp) union() {
         #cylinder(r=screw_r, h=h+1 - hsupp);
         translate([0,0,rod_r + lwall +1 + ST])
           #cylinder(r=screw_head_r, h=2*wall +1);
+        } else {
+          #cylinder(r=screw_r, h=h+2);
+        }
       }
   }
+  if (wire_clamp) union() {
   translate([-x_len/2, left_pos, rod_r + ST])
     cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
   translate([x_len/2- vsupp, left_pos, rod_r + ST])
@@ -140,10 +176,12 @@ union() {
     cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
   translate([-x_len/2, left_pos + y_len - vsupp, rod_r + ST])
     cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
+  }
 }
 }
 
 module sliding_block_bushing_clamp(
+    wire_clamp=false,
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
     hsupp=HORIZONTAL_SUPPORT_WALL,
@@ -196,12 +234,15 @@ union() {
     union() {
       translate([-x_len/2, 0, 0])
         cube([x_len, y_len, h]);
+
+      if(wire_clamp)
       translate([-wall/2, 0, 0])
         cube([wall, y_len, wire_h_pos + wire_hole + wall]);
 
       translate([-x_len/2, y_len/2 - bushing_encl_r*cos(45), 0])
         cube([x_len_total, 2*bushing_encl_r*cos(45), h]);
 
+      if(wire_clamp)
       for(i=[0,1]) mirror([i,0,0])
         translate([-screw_pos[0], 0 , strech_pos_h])
           wire_guide(wall=wall, lwall=lwall,
@@ -214,6 +255,7 @@ union() {
                      sc_head_r=strech_screw_head_r,
                      screw_r=screw_r, screw_head_r=screw_head_r);
 
+      if(wire_clamp)
       translate([screw_pos[0] - screw_head_r - wall,
                  wire_y_pos,
                  0])
@@ -243,13 +285,19 @@ union() {
                  0])
         union()
     {
+      if(wire_clamp) {
         translate([0,0,-1])
           #cylinder(r=screw_r, h=h+1 - 2*hsupp);
         translate([0,0,h+ST])
           #cylinder(r=screw_head_r, h=wire_h_pos + wall);
+      } else {
+        translate([0,0,-1])
+          #cylinder(r=screw_r, h=h+2);
+      }
     }
 
     // access to strecher screw nuts
+    if(wire_clamp)
     for(i=[0,1]) mirror([i,0,0])
     translate([-screw_pos[0] + screw_head_r + wall,
                wire_y_pos + screw_head_r,
@@ -265,8 +313,10 @@ union() {
     }
   }
 
+  if(wire_clamp)
   translate([-x_len/2, 0, (h - lwall)])
     cube([vsupp, y_len, wire_h_pos + wire_hole + wall - (h - lwall)]);
+  if(wire_clamp)
   translate([x_len/2 - vsupp, 0, (h - lwall)])
     cube([vsupp, y_len, wire_h_pos + wire_hole + wall - (h - lwall)]);
 }
