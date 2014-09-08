@@ -54,7 +54,7 @@ sliding_block_rod_clamp(
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
-if(false)
+//if(false)
 rotate([180,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -63,7 +63,7 @@ sliding_block_rod_clamp(
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
 
-//if(false)
+if(false)
 wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
@@ -85,15 +85,17 @@ module wire_guide(
   difference() {
     union() {
       translate([0,y_len - lwall, 0])
-        cube([l, 2*sc_head_r + lwall, h + wire_hole + wall]);
+        cube([l, 2*sc_head_r + 2*lwall, h + wire_hole + wall]);
       translate([l, y_len + sc_head_r, 0])
         cylinder(r=sc_head_r, h=h + wire_hole + wall);
     }
-    translate([l, y_len + sc_head_r, 0])
+    translate([l, y_len + sc_head_r, nut_h + hsupp])
       #cylinder(r=screw_r, h=h+ + wire_hole + wall + 1);
     translate([l, y_len + sc_head_r, -1])
       #cylinder(r=nut_width/sqrt(3), h=nut_h+1, $fn=6);
     translate([-1, y_len - ST, -1]) mirror([0,1,0])
+      #cube([2*l +2, lwall, wire_hole + h + 1]);
+    translate([-1, y_len  + 2*sc_head_r + ST, -1])
       #cube([2*l +2, lwall, wire_hole + h + 1]);
   }
 }
@@ -123,8 +125,10 @@ module sliding_block_rod_clamp(
   bearing_pos = (rod_r + bearing_screw_rod_d + bearing_screw_r) - 2*bearing_r;
 
   screws_y_dist = bushing_r + screw_r + ST;
-  wire_y_pos = bearing_pos + wire_pos_from_bearing_center;
-  left_pos = min(bearing_pos + wire_pos_from_bearing_center,
+  wire_y_pos = (wire_pos_from_bearing_center > 0) ?
+                 bearing_pos + wire_pos_from_bearing_center :
+                 bearing_pos + wire_pos_from_bearing_center - 2*screw_head_r;
+  left_pos = min(wire_y_pos,
                  -screws_y_dist - screw_r - lwall);
 
   screws_x_dist = 2*rod_r + 2*screw_r + ST;
