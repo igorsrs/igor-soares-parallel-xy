@@ -175,10 +175,10 @@ union() {
       }
   }
   if (wire_clamp) union() {
-  translate([-x_len/2, left_pos, rod_r + ST])
+  for (i=[0:4]) translate([-x_len/2 + i*(x_len-vsupp)/4, left_pos, rod_r + ST])
     cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
-  translate([x_len/2- vsupp, left_pos, rod_r + ST])
-    cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
+  //translate([x_len/2- vsupp, left_pos, rod_r + ST])
+  //  cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
   translate([-x_len/2, left_pos, rod_r + ST])
     cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
   translate([-x_len/2, left_pos + y_len - vsupp, rod_r + ST])
