@@ -89,8 +89,8 @@ module wire_guide(
       translate([l, y_len + sc_head_r, 0])
         cylinder(r=sc_head_r, h=h + wire_hole + wall);
     }
-    translate([l, y_len + sc_head_r, nut_h + hsupp])
-      #cylinder(r=screw_r, h=h+ + wire_hole + wall + 1);
+    translate([l, y_len + sc_head_r, nut_h -1])
+      #cylinder(r=screw_r, h=h+ wire_hole + wall + 1);
     translate([l, y_len + sc_head_r, -1])
       #cylinder(r=nut_width/sqrt(3), h=nut_h+1, $fn=6);
     translate([-1, y_len - ST, -1]) mirror([0,1,0])
@@ -127,7 +127,7 @@ module sliding_block_rod_clamp(
   screws_y_dist = bushing_r + screw_r + ST;
   wire_y_pos = (wire_pos_from_bearing_center > 0) ?
                  bearing_pos + wire_pos_from_bearing_center :
-                 bearing_pos + wire_pos_from_bearing_center - 2*screw_head_r;
+                 bearing_pos + wire_pos_from_bearing_center - 2*screw_head_r - 2*lwall;
   left_pos = min(wire_y_pos,
                  -screws_y_dist - screw_r - lwall);
 
@@ -138,7 +138,7 @@ module sliding_block_rod_clamp(
 
   screw_pos = [ -x_len/2 + lwall + screw_r, lwall + screw_r];
 
-union() {
+ union() {
   difference() {
     union() {
       translate([-x_len/2, left_pos, 0])
@@ -153,7 +153,7 @@ union() {
                      hsupp=hsupp,
                      y_len=wire_y_pos,
                      wire_hole=wire_hole,
-                     screw_r=screw_r, sc_head_r=screw_head_r);
+                     screw_r=screw_r, sc_head_r=screw_head_r + lwall);
     }
     //rod
     translate([0, left_pos -1, 0]) rotate([-90,0,0])
@@ -175,16 +175,12 @@ union() {
       }
   }
   if (wire_clamp) union() {
-  for (i=[0:4]) translate([-x_len/2 + i*(x_len-vsupp)/4, left_pos, rod_r + ST])
-    cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
-  //translate([x_len/2- vsupp, left_pos, rod_r + ST])
-  //  cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - ST]);
-  translate([-x_len/2, left_pos, rod_r + ST])
-    cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
-  translate([-x_len/2, left_pos + y_len - vsupp, rod_r + ST])
-    cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
+    for (i=[0:4]) translate([-x_len/2 + i*(x_len-vsupp)/4, left_pos, rod_r + lwall - ST])
+      cube([vsupp, y_len, wire_h_pos + wire_hole + wall - rod_r - lwall + ST]);
+    translate([-x_len/2, left_pos + y_len - vsupp, rod_r + ST])
+      cube([x_len, vsupp, wire_h_pos + wire_hole + wall - rod_r - ST]);
   }
-}
+ }
 }
 
 module sliding_block_bushing_clamp(
