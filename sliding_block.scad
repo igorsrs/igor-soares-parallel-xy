@@ -19,34 +19,32 @@
 
 include <configuration.scad>
 
-if(false)
-rotate([180,0,0])
-sliding_block_bushing_clamp(
-    wire_clamp=false,
-    $fn=64);
-if(false)
-rotate([180,0,0])
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
-);
-if(false)
-rotate([180,0,0])
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
-);
+//rotate([180,0,0])
+//sliding_block_bushing_clamp(
+//    wire_clamp=false,
+//    $fn=64);
 
-if(false)
-rotate([180,0,0])
-sliding_block_rod_clamp(
-    wire_clamp=false,
-    $fn=64);
-if(false)
+//rotate([180,0,0])
+//sliding_block_bushing_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
+//);
+
+//rotate([180,0,0])
+//sliding_block_bushing_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
+//);
+
+//rotate([180,0,0])
+//sliding_block_rod_clamp(
+//    wire_clamp=false,
+//    $fn=64);
+
 rotate([180,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -54,17 +52,17 @@ sliding_block_rod_clamp(
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
-//if(false)
-rotate([180,0,0])
-sliding_block_rod_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
-);
 
-if(false)
-wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
+//rotate([180,0,0])
+//sliding_block_rod_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+//);
+
+//translate([0,-5,0])
+//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
@@ -331,10 +329,10 @@ module wire_spool(
     hsupp=HORIZONTAL_SUPPORT_WALL,
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
-    screw_r=5.0/2,
-    screw_head_r=5.7)
+    screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
+    screw_head_r=11.4/2)
 {
-  l = lwall+ rod_r + screw_r + screw_head_r + wall;
+  l = rod_r + 3*screw_r + screw_head_r;
   union() {
     difference() {
       union() {
