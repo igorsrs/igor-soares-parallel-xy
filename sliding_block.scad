@@ -19,6 +19,8 @@
 
 include <configuration.scad>
 
+base_sliding_block($fn=64);
+
 //rotate([180,0,0])
 //sliding_block_bushing_clamp(
 //    wire_clamp=false,
@@ -32,13 +34,13 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
 //);
 
-rotate([180,0,0])
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
-);
+//rotate([180,0,0])
+//sliding_block_bushing_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
+//);
 
 //rotate([180,0,0])
 //sliding_block_rod_clamp(
@@ -353,5 +355,77 @@ module wire_spool(
             #cube([2*screw_r, wall + screw_r +1, wall+2]);
       }
     }
+  }
+}
+
+module base_sliding_block(
+    wall=WALL_WIDTH,
+    lwall=LIGHT_WALL_WIDTH,
+    hsupp=HORIZONTAL_SUPPORT_WALL,
+    vsupp=VERTICAL_SUPPORT_WALL,
+    rod_r=ROD_HOLE_DIAMETER/2,
+    screw_r=3.7/2,
+    screw_nut_width=6.7,
+    bushing_r=LINEAR_BUSHING_DIAMETER/2,
+    bushing_l=LINEAR_BUSHING_LEN,
+    bushing_wall=LINEAR_BUSHING_WALL)
+{
+  difference() {
+    union() {
+      cylinder(r=bushing_r + lwall, h=bushing_l + 2*bushing_wall);
+      translate([-bushing_r - lwall,
+                 -bushing_r - lwall - 2*rod_r - 2*screw_r - lwall,
+                 0])
+      cube([2*bushing_r + 2*lwall,
+            2*rod_r + 2*screw_r + 2*lwall,
+            2*rod_r + 2*lwall]);
+      translate([-bushing_r - lwall, 0, 0])
+        cube([2*(bushing_r + lwall), (bushing_r + lwall), bushing_l + 2*bushing_wall]);
+      translate([0, bushing_r + screw_r, bushing_l/2 + bushing_wall]) rotate([45,0,0])
+        cube([2*(bushing_r + lwall), 2*(screw_r + lwall), 2*(screw_r + lwall)],
+             center=true);
+    }
+    //rod
+    translate([0, -bushing_r - rod_r -lwall -ST, lwall + rod_r])
+      rotate([0,90,0])
+        #cylinder(r=rod_r, h=2*bushing_r + 2*lwall -2*vsupp, center=true);
+    //rod access
+    translate([-bushing_r - lwall +vsupp,
+               -bushing_r - lwall - 2*rod_r - 2*screw_r - lwall -1,
+               rod_r])
+      #cube([2*bushing_r + 2*lwall -2*vsupp,
+            2*rod_r + screw_r + lwall +1,
+            2*lwall]);
+
+    //rod screw
+    translate([0, -bushing_r - lwall - 2*rod_r - screw_r, -1])
+      #cylinder(r=screw_r, h = rod_r + lwall);
+    translate([0, -bushing_r - lwall - 2*rod_r - screw_r, rod_r + 2*lwall + hsupp])
+      #cylinder(r=screw_r, h = rod_r + lwall +1);
+
+    //bushing
+    translate([0,0,-1])
+      #cylinder(r=bushing_r - bushing_wall, h=bushing_l + bushing_wall + 1 - ST);
+    translate([0,0,bushing_l + bushing_wall + hsupp])
+      #cylinder(r=bushing_r - bushing_wall, h=bushing_wall + 1);
+    translate([0,0,bushing_wall])
+      #cylinder(r=bushing_r, h=bushing_l);
+
+    //bushing access
+    translate([-bushing_r + bushing_wall, 0, -1])
+      #cube([2*(bushing_r -bushing_wall),
+             (bushing_r + lwall) + (2*screw_r + wall)/cos(45) +1,
+             bushing_l + bushing_wall +1 - ST]);
+    translate([-bushing_r + bushing_wall, 0, bushing_l + bushing_wall + hsupp])
+      #cube([2*(bushing_r -bushing_wall),
+             (bushing_r + lwall) + (2*screw_r + wall)/cos(45) +1,
+             bushing_wall +1]);
+
+    //bushing screw
+    translate([-bushing_r - lwall -1,
+               bushing_r + screw_r,
+               bushing_l/2 + bushing_wall])
+      rotate([0,90,0])
+        #cylinder(r=screw_r, h=2*bushing_r + 2*lwall +2);
   }
 }
