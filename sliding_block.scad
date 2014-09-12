@@ -374,11 +374,13 @@ module base_sliding_block(
     union() {
       cylinder(r=bushing_r + lwall, h=bushing_l + 2*bushing_wall);
       translate([-bushing_r - lwall,
-                 -bushing_r - lwall - 2*rod_r - 2*screw_r - lwall,
+                 -bushing_r- 2*rod_r - vsupp,
                  0])
       cube([2*bushing_r + 2*lwall,
-            2*rod_r + 2*screw_r + 2*lwall,
+            vsupp + 2*rod_r + bushing_r,
             2*rod_r + 2*lwall]);
+      translate([0, -bushing_r - 2*rod_r - screw_r, 0])
+        cylinder(r=screw_r + lwall, h=2*rod_r + 2*lwall);
       translate([-bushing_r - lwall, 0, 0])
         cube([2*(bushing_r + lwall), (bushing_r + lwall), bushing_l + 2*bushing_wall]);
       translate([0, bushing_r + screw_r, bushing_l/2 + bushing_wall]) rotate([45,0,0])
@@ -386,22 +388,17 @@ module base_sliding_block(
              center=true);
     }
     //rod
-    translate([0, -bushing_r - rod_r -lwall -ST, lwall + rod_r])
+    translate([0, -bushing_r - rod_r -ST, lwall + rod_r])
       rotate([0,90,0])
-        #cylinder(r=rod_r, h=2*bushing_r + 2*lwall -2*vsupp, center=true);
-    //rod access
-    translate([-bushing_r - lwall +vsupp,
-               -bushing_r - lwall - 2*rod_r - 2*screw_r - lwall -1,
-               rod_r])
-      #cube([2*bushing_r + 2*lwall -2*vsupp,
-            2*rod_r + screw_r + lwall +1,
-            2*lwall]);
+        #cylinder(r=rod_r, h=2*bushing_r + 2*lwall +2*vsupp, center=true);
 
     //rod screw
-    translate([0, -bushing_r - lwall - 2*rod_r - screw_r, -1])
+    translate([0, -bushing_r - 2*rod_r - screw_r, -1])
       #cylinder(r=screw_r, h = rod_r + lwall);
-    translate([0, -bushing_r - lwall - 2*rod_r - screw_r, rod_r + 2*lwall + hsupp])
+    translate([0, -bushing_r - 2*rod_r - screw_r, rod_r + 2*lwall + hsupp])
       #cylinder(r=screw_r, h = rod_r + lwall +1);
+    translate([0, -bushing_r - 2*rod_r - screw_r, rod_r -ST])
+      #cylinder(r=screw_r + lwall - vsupp, h=2*lwall);
 
     //bushing
     translate([0,0,-1])
