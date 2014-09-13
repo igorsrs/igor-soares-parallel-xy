@@ -208,36 +208,13 @@ module sliding_block_bushing_clamp(
     strech_screw_nut_h=3.0,
     bushing_wall=LINEAR_BUSHING_WALL)
 {
-  h=wall + lwall;
-
-  screws_x_dist = 2*rod_r + 2*screw_r + ST;
-  x_len = screws_x_dist + 2*screw_r + 2*lwall;
-  x_len_bushing = bushing_l + 2*lwall;
-  x_len_total = max(x_len, x_len_bushing);
-
-  screws_y_dist = 2*bushing_r + 2*screw_r + ST;
-
-  left_pos = min(wire_y_pos,
-                 -screws_y_dist - screw_r - lwall);
-
-
-  y_left_2 = min(wire_y_pos, 0);
-  y_len_total = screws_y_dist + 2*screw_r + 2*lwall - y_left_2;
-  y_len = screws_y_dist + 2*screw_r + 2*lwall;
-
-  screw_pos = [ -x_len/2 + lwall + screw_r, lwall + screw_r];
-  bushing_encl_r= bushing_r + lwall;
-
   wire_h_pos = rod_r + wire_h;
-
-  x_len_total2 = max(x_len_total, 6*screw_head_r + 2*wall);
 
   inner_pos = (rod_r + bearing_pos + bearing_screw_r);
   second_pos = -(2*bearing_r) + inner_pos;
   wire_y_pos = second_pos + wire_pos_from_bearing_center;
 
 
-echo(wire_h_pos);
   difference() {
     union() {
       base_sliding_block_positive(
@@ -250,11 +227,26 @@ echo(wire_h_pos);
           bushing_r=bushing_r,
           bushing_l=bushing_l,
           bushing_wall=bushing_wall);
-      translate([wire_y_pos, wire_h_pos, 0])
-        cylinder(r=1, h=bushing_l);
+
+      //wire representation
+      translate([wire_y_pos, wire_h_pos, -1])
+        %cylinder(r=1, h=bushing_l + 2*bushing_wall + 2);
+
+      //wire contact wall
+      if (wire_pos_from_bearing_center > 0) {
+        translate([wire_y_pos, 0, 0])
+          cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
+      } else {
+        translate([wire_y_pos - wall, 0, 0])
+          cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
+      }
+      translate([wire_y_pos - lwall, wire_h_pos, 0])
+        cube([2*lwall, wall, bushing_l + 2*bushing_wall]);
+      translate([wire_y_pos - ST, 0, 0])
+        cube([-wire_y_pos, bushing_r + lwall, bushing_l + 2*bushing_wall]);
     }
 
-    #base_sliding_block_negative(
+    base_sliding_block_negative(
         wall=wall,
         lwall=lwall,
         hsupp=hsupp,
