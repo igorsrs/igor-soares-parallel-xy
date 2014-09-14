@@ -33,7 +33,6 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
 //);
 
-rotate([180,0,0])
 sliding_block_bushing_clamp(
     wire_clamp=true,
     $fn=64,
@@ -214,6 +213,14 @@ module sliding_block_bushing_clamp(
   second_pos = -(2*bearing_r) + inner_pos;
   wire_y_pos = second_pos + wire_pos_from_bearing_center;
 
+  wire_wall_pos = (wire_pos_from_bearing_center > 0) ?
+                    wire_y_pos :
+                    wire_y_pos - wall;
+
+  screw_wall_pos = wire_wall_pos - 2*strech_screw_head_r - lwall;
+  strech_screws_pos = lwall + strech_screw_head_r;
+  strech_screws_distance = 15;
+  strech_screw_hole_pos = (-strech_screws_pos + vsupp)/2;
 
   difference() {
     union() {
@@ -233,17 +240,19 @@ module sliding_block_bushing_clamp(
         %cylinder(r=1, h=bushing_l + 2*bushing_wall + 2);
 
       //wire contact wall
-      if (wire_pos_from_bearing_center > 0) {
-        translate([wire_y_pos, 0, 0])
-          cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
-      } else {
-        translate([wire_y_pos - wall, 0, 0])
-          cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
-      }
+      translate([wire_wall_pos, 0, 0])
+        cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
       translate([wire_y_pos - lwall, wire_h_pos, 0])
         cube([2*lwall, wall, bushing_l + 2*bushing_wall]);
       translate([wire_y_pos - ST, 0, 0])
         cube([-wire_y_pos, bushing_r + lwall, bushing_l + 2*bushing_wall]);
+
+      //strech screws wall
+      translate([screw_wall_pos, wire_h_pos, 0]) union() {
+        cube([2*strech_screw_head_r + lwall + ST,
+               wall + strech_screw_nut_h,
+               bushing_l + 2*bushing_wall]);
+      }
     }
 
     base_sliding_block_negative(
@@ -256,6 +265,40 @@ module sliding_block_bushing_clamp(
         bushing_r=bushing_r,
         bushing_l=bushing_l,
         bushing_wall=bushing_wall);
+    translate([wire_y_pos - wall - 1,
+               wire_h_pos + vsupp,
+               bushing_l/2 + bushing_wall - lwall])
+      #cube([2*wall, wall - 2*vsupp, 2*lwall]);
+
+    translate([screw_wall_pos, wire_h_pos, bushing_l/2 + bushing_wall])
+      union()
+    {
+      for (i=[-1,1])
+        translate([strech_screws_pos, -1, i*strech_screws_distance/2])
+          rotate([-90,0,0])
+      {
+            #cylinder(r=strech_screw_nut_width/(2*cos(30)),
+                      h=strech_screw_nut_h +1,
+                      $fn=6);
+            #cylinder(r=strech_screw_r,
+                      h=strech_screw_nut_h + wall + 2);
+
+        translate([strech_screw_hole_pos,
+                   0,
+                   strech_screw_nut_h/2 + wall/2 +1])
+            #cube([((strech_screw_hole_pos >0) ? 2 : -2) *strech_screw_hole_pos,
+                   2*strech_screw_r,
+                   strech_screw_nut_h + wall + 2],
+                   center=true);
+        translate([strech_screw_hole_pos,
+                   0,
+                   strech_screw_nut_h/2 + 1/2])
+            #cube([((strech_screw_hole_pos >0) ? 2 : -2) *strech_screw_hole_pos,
+                   strech_screw_nut_width,
+                   strech_screw_nut_h + 1],
+                   center=true);
+      }
+    }
   }
 
 }
