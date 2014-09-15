@@ -19,7 +19,7 @@
 
 include <configuration.scad>
 
-//base_sliding_block($fn=64);
+screw_wall($fn=64);
 
 //rotate([180,0,0])
 //sliding_block_bushing_clamp(
@@ -33,12 +33,12 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 1
 //);
 
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
-);
+//sliding_block_bushing_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
+//);
 
 //rotate([180,0,0])
 //sliding_block_rod_clamp(
@@ -97,6 +97,49 @@ module wire_guide(
       #cube([2*l +2, lwall, wire_hole + h + 1]);
   }
 }
+
+module screw_wall(
+         wall=5,
+         lwall=2,
+         vsupp=-0.1,
+         screw_r=2,
+         screw_head_r=4,
+         screw_nut_width=7,
+         screw_nut_h = 3.5,
+         screws_separation  = 10,
+         total_len = 20)
+{
+  w = 2*screw_head_r + 2*wall;
+
+  screws_block_l = screws_separation + screw_nut_width/cos(30);
+
+  difference() {
+    union() {
+      cube([w, wall + screw_nut_h, total_len]);
+    }
+    translate([w/2, -1, total_len/2]) rotate([-90,0,0])
+      #cylinder(r=screw_head_r, h=screw_nut_h + wall + 2);
+
+    translate([w/2, vsupp, total_len/2])
+      rotate([-90,0,0])
+        union()
+    {
+      for(i=[-1,1]) translate([0, i*screws_separation/2, 0]) union() {
+        //rotate([0,0,30])
+        //  #cylinder(r=screw_nut_width/(2*cos(30)), h=screw_nut_h -vsupp, $fn=6);
+        translate([0,0,screw_nut_h])
+          #cylinder(r=screw_r, h=wall - 2*vsupp);
+      }
+      translate([-screw_r, -screws_separation/2, screw_nut_h])
+        #cube([2*screw_r, screws_separation, wall -2*vsupp]);
+      translate([-screw_nut_width/2,
+                 -screws_block_l/2,
+                 0])
+        #cube([screw_nut_width, screws_block_l, screw_nut_h -vsupp]);
+    }
+  }
+}
+
 module sliding_block_rod_clamp(
     wire_clamp=false,
     wall=WALL_WIDTH,
