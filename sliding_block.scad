@@ -36,7 +36,7 @@ include <configuration.scad>
 sliding_block_rod_clamp(
     wire_clamp=true,
     $fn=64,
-    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
+    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
 
@@ -137,8 +137,8 @@ module sliding_block_rod_clamp(
     bearing_r=BEARING_DIAMETER/2,
     bearing_screw_r=BEARING_SCREW_DIAMETER/2,
     bearing_screw_rod_d=INNER_BEARING_SCREW_DISTANCE_TO_ROD,
-    screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
-    screw_head_r=11.4/2,
+    screw_r=3.7/2,
+    screw_head_r=8/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
@@ -162,7 +162,9 @@ module sliding_block_rod_clamp(
                     wire_y_pos - wall:
                     wire_y_pos;
 
-  screw_wall_pos = wire_wall_pos - 2*strech_screw_head_r - wall - ST;
+  screw_wall_pos = (wire_pos_from_bearing_center > 0 ) ?
+                      wire_wall_pos - 2*strech_screw_head_r - wall - ST :
+                      wire_wall_pos;
   strech_screws_pos = lwall + strech_screw_head_r;
   strech_screws_distance = 15;
   strech_screw_hole_pos = (-strech_screws_pos + vsupp)/2;
@@ -191,8 +193,11 @@ module sliding_block_rod_clamp(
             cube([wall, wire_h_pos + 3*wall + ST, bushing_l + 2*bushing_wall]);
           translate([wire_y_pos - lwall, wire_h_pos, 0])
             cube([2*lwall, wall, bushing_l + 2*bushing_wall]);
-          translate([wire_y_pos - ST, 0, 0])
-            cube([-wire_y_pos, bushing_r + lwall, bushing_l + 2*bushing_wall]);
+          translate([0, -2*lwall, 0])
+            cube([wire_y_pos + wall, bushing_r + lwall, bushing_l + 2*bushing_wall]);
+          if (wire_pos_from_bearing_center < 0)
+            translate([0, bushing_r - lwall- ST, 2*lwall + 2*rod_r - ST])
+              cube([wire_y_pos + wall, lwall + 2*rod_r + vsupp, lwall]);
 
           //strech screws wall
           translate([screw_wall_pos, wire_h_pos + 2*wall, 0]) {
@@ -211,9 +216,9 @@ module sliding_block_rod_clamp(
         }
 
         translate([wire_wall_pos + vsupp, 0, -1])
-          #cube([wall -2*vsupp, wire_h_pos +1*wall + ST, rod_r + 2*lwall +1 - ST]);
-        translate([wire_y_pos - lwall, wire_h_pos + vsupp, -1])
-          #cube([2*lwall - vsupp, wall - 2*vsupp, rod_r + 2*lwall +1 - ST]);
+          #cube([wall -2*vsupp, wire_h_pos +1*wall + ST, 2*rod_r + lwall +1 - ST]);
+        translate([wire_y_pos - lwall + vsupp, wire_h_pos + vsupp, -1])
+          #cube([2*lwall - 2*vsupp, wall - 2*vsupp, 2*rod_r + lwall +1 - ST]);
 
       }
     }
