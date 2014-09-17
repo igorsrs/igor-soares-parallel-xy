@@ -33,12 +33,12 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
 //);
 
-sliding_block_rod_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
-);
+//sliding_block_rod_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+//);
 
 //sliding_block_rod_clamp(
 //    wire_clamp=true,
@@ -47,8 +47,8 @@ sliding_block_rod_clamp(
 //    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 //);
 
-//translate([0,-5,0])
-//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
+translate([0,-5,0])
+wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
@@ -375,26 +375,27 @@ module wire_spool(
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
     screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
+    strech_screws_distance = 15,
     screw_head_r=11.4/2)
 {
-  l = rod_r + 3*screw_r + screw_head_r;
+  l = strech_screws_distance/2;
   union() {
     difference() {
       union() {
         translate([-l, -wall, wall/2]) rotate([0,90,0]) {
-          cylinder(r=wall/2, h=2*l);
-          translate([-wall/2, 0, 0])
-            cube([wall, wall, 2*l]);
-          translate([0, wall, 0])
-            cylinder(r=wall/2, h=2*l);
+          translate([0, wall + screw_r, 0])
+            #cylinder(r=wall/2, h=2*l + screw_r + 2*wall);
         }
         for (i=[-1,1]) translate([i*l, 0, 0]) {
-            cylinder(r=screw_r + wall, h=wall);
+            cylinder(r1=screw_r + wall,
+                     r2=screw_r + lwall,
+                     h=wall);
+            cylinder(r2=screw_r + wall,
+                     r1=screw_r + lwall,
+                     h=wall);
             mirror([0,1,0]) translate([-screw_r - wall, 0, 0])
               cube([2*(screw_r+ wall), wall + screw_r, wall]);
         }
-        translate([-wall , -wall/2, ST])
-          cylinder(r1=wall/2, r2=1.5*wall/2, h=wall+ lwall);
       }
       for (i=[-1,1]) translate([i*l, 0, -1]) {
           #cylinder(r=screw_r, h=wall +2);
