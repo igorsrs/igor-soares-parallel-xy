@@ -165,6 +165,9 @@ module sliding_block_rod_clamp(
   screw_wall_pos = (wire_pos_from_bearing_center > 0 ) ?
                       wire_wall_pos - 2*strech_screw_head_r - wall - ST :
                       wire_wall_pos;
+  screw_wall_h = (wire_pos_from_bearing_center > 0 ) ?
+                   wire_h_pos + 2*wall :
+                   wire_h_pos;
   strech_screws_pos = lwall + strech_screw_head_r;
   strech_screws_distance = 15;
   strech_screw_hole_pos = (-strech_screws_pos + vsupp)/2;
@@ -190,7 +193,7 @@ module sliding_block_rod_clamp(
 
           //wire contact wall
           translate([wire_wall_pos, 0, 0])
-            cube([wall, wire_h_pos + 3*wall + ST, bushing_l + 2*bushing_wall]);
+            cube([wall, screw_wall_h + wall + ST, bushing_l + 2*bushing_wall]);
           translate([wire_y_pos - lwall, wire_h_pos, 0])
             cube([2*lwall, wall, bushing_l + 2*bushing_wall]);
           translate([0, -2*lwall, 0])
@@ -200,7 +203,7 @@ module sliding_block_rod_clamp(
               cube([wire_y_pos + wall, lwall + 2*rod_r + vsupp, lwall]);
 
           //strech screws wall
-          translate([screw_wall_pos, wire_h_pos + 2*wall, 0]) {
+          translate([screw_wall_pos, screw_wall_h, 0]) {
             screw_wall(
               wall=wall,
               lwall=lwall,
