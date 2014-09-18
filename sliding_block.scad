@@ -40,15 +40,15 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 //);
 
-sliding_block_rod_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
-);
+//sliding_block_rod_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+//);
 
-//translate([0,-5,0])
-//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
+translate([0,-5,0])
+wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
