@@ -28,7 +28,7 @@ INNER_DIAMETER = 80./PI;
 DEFAILT_SPOOL_H=16;
 INNER_SHAFT_DIAMETER = 5.5;
 
-$fn=64;
+$fn=16;
 line_spool();
 
 module line_spool(
@@ -87,16 +87,37 @@ module line_spool(
         translate([-wall/2,0,spool_h -ST])
           cube([wall, thread_inner_diameter/2 - lwall, clamp_h]); 
 
-        translate([lwall/2, -inner_shaft_diameter/2 - lwall - screw_head_r, spool_h])
-          cube([lwall, inner_shaft_diameter/2 + lwall + screw_head_r, clamp_h]);
+        translate([lwall/2,
+                   -inner_shaft_diameter/2 - lwall - screw_head_r,
+                   spool_h])
+          cube([lwall,
+                inner_shaft_diameter/2 + lwall + screw_head_r,
+                clamp_h]);
 
-        translate([-1.5*lwall - screw_nut_h, -inner_shaft_diameter/2 - lwall - screw_head_r, spool_h])
-          cube([lwall + screw_nut_h, inner_shaft_diameter/2 + lwall + screw_head_r, clamp_h]);
+        translate([-1.5*lwall - screw_nut_h,
+                   -inner_shaft_diameter/2 - lwall - screw_head_r,
+                   spool_h])
+          cube([lwall + screw_nut_h,
+                inner_shaft_diameter/2 + lwall + screw_head_r,
+                clamp_h]);
       }
       translate([0,0,-1])
         #cylinder(r=inner_shaft_diameter/2, h=spool_h +clamp_h+2);
       translate([-lwall/2, -inner_shaft_diameter/2 -lwall -1, spool_h + 3*hsupp])
         #cube([lwall, inner_shaft_diameter/2 + lwall +1, clamp_h]);
+
+      translate([lwall/2 + vsupp,
+                 -inner_shaft_diameter/2 - lwall - screw_head_r -1,
+                 spool_h])
+        #cube([lwall - 2*vsupp,
+               inner_shaft_diameter/2 + lwall + screw_head_r,
+               2*hsupp]);
+      translate([-1.5*lwall - screw_nut_h + vsupp,
+                 -inner_shaft_diameter/2 - lwall - screw_head_r - 1,
+                 spool_h])
+        #cube([lwall + screw_nut_h - 2*vsupp,
+               inner_shaft_diameter/2 + lwall + screw_head_r,
+               2*hsupp]);
     }
     translate([0,0,spool_h + 2*hsupp +ST])
       cylinder(r=inner_shaft_diameter/2 + lwall, h=hsupp);
