@@ -376,33 +376,25 @@ module wire_spool(
     rod_r=ROD_HOLE_DIAMETER/2,
     screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
     strech_screws_distance = 15,
-    screw_head_r=11.4/2)
+    screw_head_r=11.4/2,
+    wire_hole=1)
 {
-  l = strech_screws_distance/2;
-  union() {
-    difference() {
-      union() {
-        translate([-l, -wall, wall/2]) rotate([0,90,0]) {
-          translate([0, wall + screw_r, 0])
-            #cylinder(r=wall/2, h=2*l + screw_r + 2*wall);
-        }
-        for (i=[-1,1]) translate([i*l, 0, 0]) {
-            cylinder(r1=screw_r + wall,
-                     r2=screw_r + lwall,
-                     h=wall);
-            cylinder(r2=screw_r + wall,
-                     r1=screw_r + lwall,
-                     h=wall);
-            mirror([0,1,0]) translate([-screw_r - wall, 0, 0])
-              cube([2*(screw_r+ wall), wall + screw_r, wall]);
-        }
-      }
-      for (i=[-1,1]) translate([i*l, 0, -1]) {
-          #cylinder(r=screw_r, h=wall +2);
-          mirror([0,1,0]) translate([-screw_r, 0, 0])
-            #cube([2*screw_r, wall + screw_r +1, wall+2]);
-      }
+  difference() {
+    union() {
+      cylinder(r=screw_r + wall, h=lwall + ST);
+      translate([0,0,lwall - ST])
+        cylinder(r1=screw_r + wall, r2=screw_r + lwall, h=wall/2 + 2*ST);
+      translate([0,0,lwall + wall/2 - ST])
+        cylinder(r2=screw_r + wall, r1=screw_r + lwall, h=wall/2 + ST);
+
+      //wire knot place
+      translate([0, 0, 0])
+        cube([lwall, screw_r + wall + lwall, lwall]);
     }
+    translate([0,0,-1])
+      #cylinder(r=screw_r, h=lwall + wall + 2);
+    translate([0,0,-1])
+      #cylinder(r=screw_r, h=lwall + wall + 2);
   }
 }
 
