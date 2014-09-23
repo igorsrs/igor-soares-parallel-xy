@@ -19,12 +19,17 @@
 
 include <configuration.scad>
 
-REVERT = true;
+REVERT = false;
+
+//motor_bracket_lower_decker($fn=64);
+//
+//translate([14,0, 2*WALL_WIDTH +BEARING_WIDTH])
+//motor_bracket_upper_decker($fn=64);
 
 motor_bracket_lower_decker($fn=64);
 
-//translate([14,0, 2*WALL_WIDTH +BEARING_WIDTH])
-//motor_bracket_upper_decker($fn=64);
+translate([14,0, 2*WALL_WIDTH +BEARING_WIDTH])
+motor_bracket_upper_decker($fn=64, bearing_screw_nut_width=BEARING_SCREW_NUT_WIDTH + 5);
 
 module motor_bracket_upper_decker(
     lwall=LIGHT_WALL_WIDTH,
