@@ -40,15 +40,15 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 //);
 
-//sliding_block_rod_clamp(
-//    wire_clamp=true,
-//    $fn=64,
-//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-//    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
-//);
+sliding_block_rod_clamp(
+    wire_clamp=true,
+    $fn=64,
+    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+);
 
-translate([0,-5,0])
-wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
+//translate([0,-5,0])
+//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
@@ -218,10 +218,8 @@ module sliding_block_rod_clamp(
           }
         }
 
-        translate([wire_wall_pos + vsupp, 0, -1])
-          #cube([wall -2*vsupp, wire_h_pos +1*wall + ST, 2*rod_r + lwall +1 - ST]);
-        translate([wire_y_pos - lwall + vsupp, wire_h_pos + vsupp, -1])
-          #cube([2*lwall - 2*vsupp, wall - 2*vsupp, 2*rod_r + lwall +1 - ST]);
+        translate([wire_wall_pos + vsupp, bushing_r - lwall, -1])
+          #cube([wall -2*vsupp, 2*lwall + 2*rod_r, 2*rod_r + lwall +1 - ST]);
 
       }
     }
@@ -236,12 +234,6 @@ module sliding_block_rod_clamp(
         bushing_r=bushing_r,
         bushing_l=bushing_l,
         bushing_wall=bushing_wall);
-    rotate([0,0,180]) {
-      translate([wire_y_pos - wall - 1,
-                 wire_h_pos + vsupp,
-                 bushing_l/2 + bushing_wall - lwall + rod_r/2 + lwall])
-        #cube([2*wall, wall - 2*vsupp, 2*lwall]);
-    }
   }
 
 }
