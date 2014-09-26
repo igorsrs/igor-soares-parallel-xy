@@ -298,12 +298,23 @@ union() {
         %cylinder(r=1, h=bushing_l + 2*bushing_wall + 2);
 
       //wire contact wall
-      translate([wire_wall_pos, 0, 0])
-        cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
       translate([wire_y_pos - lwall, wire_h_pos, 0])
         cube([2*lwall, wall, bushing_l + 2*bushing_wall]);
-      translate([wire_y_pos - ST, 0, 0])
-        cube([-wire_y_pos, bushing_r + lwall, bushing_l + 2*bushing_wall]);
+      if (wire_pos_from_bearing_center < 0) difference() {
+        union() {
+          translate([wire_wall_pos, - bushing_r + rod_r, 0])
+            cube([wall, bushing_r - rod_r +wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
+          translate([wire_y_pos - ST, - bushing_r + rod_r, 0])
+            cube([-wire_y_pos, 2*bushing_r + lwall - rod_r, bushing_l + 2*bushing_wall]);
+       }
+       translate([wire_y_pos - wall + vsupp- ST, - bushing_r - lwall - 1, lwall])
+         #cube([-wire_y_pos, 2*bushing_r + 2*lwall +1 - wall, bushing_l + 2*bushing_wall - 2*lwall]);
+     } else union() {
+       translate([wire_wall_pos, 0, 0])
+         #cube([wall, wire_h_pos + wall + ST, bushing_l + 2*bushing_wall]);
+       translate([wire_y_pos - ST, 0, 0])
+         cube([-wire_y_pos, bushing_r + lwall, bushing_l + 2*bushing_wall]);
+     }
 
       //strech screws wall
       translate([screw_wall_pos + (
@@ -324,15 +335,32 @@ union() {
             );
 
         if (wire_pos_from_bearing_center > 0) union() {
-          translate([wire_y_pos, bushing_r + lwall - ST, 0])
+          translate([wire_y_pos, bushing_r + lwall - ST, +ST])
             cube([strech_screw_head_r + 2*wall - strech_screw_nut_width/2,
                   wire_h_pos - bushing_r,
                   lwall]);
           translate([wire_y_pos + wall, bushing_r + lwall - ST,
-                     2*strech_screw_head_r + lwall + strech_screws_distance - lwall])
+                     2*strech_screw_head_r + lwall + strech_screws_distance - lwall + ST])
             cube([strech_screw_head_r + wall - strech_screw_nut_width/2,
                   wire_h_pos - bushing_r,
                   lwall]);
+        } else union() {
+          translate([wire_y_pos - wall - wall/2 - strech_screw_head_r + strech_screw_nut_width/2,
+                     -bushing_r + rod_r, 0])
+            cube([strech_screw_head_r + wall - strech_screw_nut_width/2,
+                  wire_h_pos + bushing_r - rod_r +ST,
+                  lwall]);
+          translate([wire_y_pos - wall - wall/2 - strech_screw_head_r + strech_screw_nut_width/2,
+                     -bushing_r + rod_r,
+                     2*strech_screw_head_r + lwall + strech_screws_distance - lwall])
+            cube([strech_screw_head_r + wall - strech_screw_nut_width/2,
+                  wire_h_pos + bushing_r - rod_r +ST,
+                  lwall]);
+          translate([wire_y_pos - wall - wall/2 - strech_screw_head_r + strech_screw_nut_width/2,
+                     -bushing_r + rod_r, 0])
+            cube([strech_screw_head_r + wall - strech_screw_nut_width/2,
+                  lwall,
+                  2*strech_screw_head_r + strech_screws_distance + lwall]);
         }
     }
 
