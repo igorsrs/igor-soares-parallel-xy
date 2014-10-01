@@ -20,7 +20,8 @@
 include <configuration.scad>
 
 linear_bushing_housing($fn=64);
-module linear_bushing_housing(
+
+module linear_bushing_housing_positive(
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
     hsupp=HORIZONTAL_SUPPORT_WALL,
@@ -32,35 +33,49 @@ module linear_bushing_housing(
     bushing_wall=LINEAR_BUSHING_WALL,
     num_screws=1)
 {
-  difference() {
-    union() {
-      //bushing
-      cylinder(r=bushing_r + lwall, h=bushing_l + 2*bushing_wall);
-      translate([0, -bushing_r - lwall, 0])
-        cube([(bushing_r + screw_r),
-              2*(bushing_r + lwall),
-              bushing_l + 2*bushing_wall]);
-      //bushing screws
-      if(num_screws >= 1)
-        translate([(bushing_r + screw_r),
-                   0,
-                   (lwall+screw_r)/cos(45)])
-          rotate([0,45,0])
-            cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
-                 center=true);
-      if(num_screws >= 2)
-        translate([(bushing_r + screw_r),
-                   0,
-                   bushing_l + 2*bushing_wall - (lwall+screw_r)/cos(45)])
-          rotate([0,45,0])
-            cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
-                 center=true);
-    }
+  union() {
     //bushing
-    translate([0,0,-1])
-      cylinder(r=bushing_r - bushing_wall, h=bushing_l + bushing_wall + 1 - ST);
+    cylinder(r=bushing_r + lwall, h=bushing_l + 2*bushing_wall);
+    translate([0, -bushing_r - lwall, 0])
+      cube([(bushing_r + screw_r),
+            2*(bushing_r + lwall),
+            bushing_l + 2*bushing_wall]);
+    //bushing screws
+    if(num_screws >= 1)
+      translate([(bushing_r + screw_r),
+                 0,
+                 (lwall+screw_r)/cos(45)])
+        rotate([0,45,0])
+          cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
+               center=true);
+    if(num_screws >= 2)
+      translate([(bushing_r + screw_r),
+                 0,
+                 bushing_l + 2*bushing_wall - (lwall+screw_r)/cos(45)])
+        rotate([0,45,0])
+          cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
+               center=true);
+  }
+}
+
+module linear_bushing_housing_negative(
+    wall=WALL_WIDTH,
+    lwall=LIGHT_WALL_WIDTH,
+    hsupp=HORIZONTAL_SUPPORT_WALL,
+    vsupp=VERTICAL_SUPPORT_WALL,
+    screw_r=3.7/2,
+    screw_nut_width=6.7,
+    bushing_r=LINEAR_BUSHING_DIAMETER/2,
+    bushing_l=LINEAR_BUSHING_LEN,
+    bushing_wall=LINEAR_BUSHING_WALL,
+    num_screws=1)
+{
+  union() {
+    //bushing
+    translate([0,0,-ST])
+      cylinder(r=bushing_r - bushing_wall, h=bushing_l + bushing_wall);
     translate([0,0,bushing_l + bushing_wall + hsupp])
-      cylinder(r=bushing_r - bushing_wall, h=bushing_wall + 1);
+      cylinder(r=bushing_r - bushing_wall, h=bushing_wall + ST);
     translate([0,0,bushing_wall])
       cylinder(r=bushing_r, h=bushing_l);
 
@@ -68,14 +83,14 @@ module linear_bushing_housing(
     translate([0, -bushing_r + bushing_wall, 0])
       union()
     {
-      translate([0,0,-1])
+      translate([0,0,-ST])
         cube([(bushing_r + lwall) + (2*screw_r + wall)/cos(45) +1,
                2*(bushing_r -bushing_wall),
-               bushing_l + bushing_wall +1 - ST]);
+               bushing_l + bushing_wall]);
       translate([0, 0, bushing_l + bushing_wall + hsupp])
         cube([(bushing_r + lwall) + (2*screw_r + wall)/cos(45) +1,
                2*(bushing_r -bushing_wall),
-               bushing_wall +1]);
+               bushing_wall +ST]);
     }
     //bushing screws
     if(num_screws >= 1)
@@ -91,5 +106,43 @@ module linear_bushing_housing(
                  bushing_l + 2*bushing_wall - (lwall+screw_r)/cos(45)])
         rotate([90,0,0])
           cylinder(r=screw_r, h=2*bushing_r + 2*lwall +2, center=true);
+  }
+}
+
+module linear_bushing_housing(
+    wall=WALL_WIDTH,
+    lwall=LIGHT_WALL_WIDTH,
+    hsupp=HORIZONTAL_SUPPORT_WALL,
+    vsupp=VERTICAL_SUPPORT_WALL,
+    screw_r=3.7/2,
+    screw_nut_width=6.7,
+    bushing_r=LINEAR_BUSHING_DIAMETER/2,
+    bushing_l=LINEAR_BUSHING_LEN,
+    bushing_wall=LINEAR_BUSHING_WALL,
+    num_screws=1)
+{
+  difference() {
+    linear_bushing_housing_positive(
+      wall=wall,
+      lwall=lwall,
+      hsupp=hsupp,
+      vsupp=vsupp,
+      screw_r=screw_r,
+      screw_nut_width=screw_nut_width,
+      bushing_r=bushing_r,
+      bushing_l=bushing_l,
+      bushing_wall=bushing_wall,
+      num_screws=num_screws);
+    linear_bushing_housing_negative(
+      wall=wall,
+      lwall=lwall,
+      hsupp=hsupp,
+      vsupp=vsupp,
+      screw_r=screw_r,
+      screw_nut_width=screw_nut_width,
+      bushing_r=bushing_r,
+      bushing_l=bushing_l,
+      bushing_wall=bushing_wall,
+      num_screws=num_screws);
   }
 }
