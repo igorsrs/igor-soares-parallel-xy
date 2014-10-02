@@ -20,21 +20,39 @@
 include <configuration.scad>
 use <linear_bushing_housing.scad>
 
+mirror([0,1,0])
 z_car($fn=64);
 
 module z_car(
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
-    hsupp=HORIZONTAL_SUPPORT_WALL,
+    hsupp=HORIZONTAL_SUPPORT_WALL*2,
     vsupp=VERTICAL_SUPPORT_WALL,
     screw_r=3.7/2,
     screw_nut_width=6.7,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
     bushing_wall=LINEAR_BUSHING_WALL,
-    total_len=100)
+    total_len=100,
+    bed_screw_r=3.7/2,
+    bed_screws_room=6,
+    bed_screws_separation=40)
 {
   bushings_separation = total_len - 2*bushing_l - 4*bushing_wall;
+  bed_base_len = bushing_r + lwall + bed_screws_room + bed_screws_separation +
+                 bed_screws_room;
+  screws_pos = [
+    [
+      -(bushing_r + lwall + bed_screws_room),
+      bushing_r + lwall + bed_screws_room,
+      0
+    ], [
+      -bed_screws_separation - (bushing_r + lwall + bed_screws_room),
+      bushing_r + lwall + bed_screws_room,
+      0
+    ]
+  ];
+
 
   difference() {
     union() {
@@ -76,6 +94,20 @@ module z_car(
             bushing_l=bushing_l,
             bushing_wall=bushing_wall,
             num_screws=1);
+
+      translate([-bed_base_len, bushing_r + lwall - wall, ST])
+        difference()
+      {
+         cube([bed_base_len, wall, bed_base_len + wall]);
+         translate([0,-1,wall + ST]) rotate([0,-45,0])
+          #cube([bed_base_len*sqrt(2), wall +2, bed_base_len*sqrt(2)]);
+      }
+      translate([-bed_base_len, bushing_r + lwall - wall, ST])
+         cube([bed_base_len, wall + bed_screws_room, wall]);
+      for (sp=screws_pos)
+        translate(sp){
+          cylinder(r=bed_screws_room - ST, h=wall);
+      }
     }
     #linear_bushing_housing_negative(
       wall=wall,
@@ -113,5 +145,10 @@ module z_car(
             bushing_l=bushing_l,
             bushing_wall=bushing_wall,
             num_screws=1);
+
+      for (sp=screws_pos)
+        translate(sp) translate([0,0,-1]){
+          #cylinder(r=bed_screw_r - ST, h=wall+2);
+      }
   }
 }

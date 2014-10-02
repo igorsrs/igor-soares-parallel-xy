@@ -19,20 +19,20 @@
 
 include <configuration.scad>
 
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
-);
-
-//mirror([0,1,0])
 //sliding_block_bushing_clamp(
 //    wire_clamp=true,
 //    $fn=64,
-//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_pos_from_bearing_center=BEARING_DIAMETER/2,
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
 //);
+
+mirror([0,1,0])
+sliding_block_bushing_clamp(
+    wire_clamp=true,
+    $fn=64,
+    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
+);
 
 //sliding_block_rod_clamp(
 //    wire_clamp=true,
@@ -250,8 +250,8 @@ module sliding_block_bushing_clamp(
     bearing_r=BEARING_DIAMETER/2,
     bearing_screw_r=BEARING_SCREW_DIAMETER/2,
     bearing_screw_rod_d=INNER_BEARING_SCREW_DISTANCE_TO_ROD,
-    screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
-    screw_head_r=11.4/2,
+    screw_r=3.7/2,
+    screw_head_r=8/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
