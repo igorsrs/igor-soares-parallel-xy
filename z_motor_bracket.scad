@@ -29,9 +29,9 @@ module z_motor_bracket(
     vsupp=VERTICAL_SUPPORT_WALL,
     screw_mount=MOTOR_SCREW_MOUNT,
     screw_r=MOTOR_SCREW_DIAMETER/2,
-    screw_clearance=MOTOR_SCREW_DIAMETER/2 + WALL_WIDTH,
+    screw_clearance=MOTOR_SCREW_DIAMETER,
     clamp_screw=5.7/2,
-    clamp_width=25,
+    clamp_width=18,
     clamp_size=2*WALL_WIDTH,
     h_distance=70,
     l_distance=30)
@@ -40,6 +40,9 @@ module z_motor_bracket(
   clamp_h = screw_mount + 2*screw_clearance + 2*wall;
 
   mount_h_center = screw_mount/2 + screw_clearance + wall;
+
+  angle = 90 +atan2(h_distance, clamp_total_r +l_distance +
+                                screw_mount/2 + screw_clearance);
   difference() {
     union() {
       cylinder(r=clamp_total_r, h=clamp_h);
@@ -49,17 +52,24 @@ module z_motor_bracket(
       //h distance
       translate([-h_distance, clamp_total_r - wall, 0])
         cube([h_distance, wall, clamp_h]);
-      //translate([-h_distance, -clamp_total_r, 0])
-      //  cube([h_distance, 2*clamp_total_r - ST, wall]);
+      translate([-h_distance, -clamp_total_r, 0])
+        cube([h_distance, 2*clamp_total_r - ST, wall]);
       //translate([-h_distance, -clamp_total_r, clamp_h - wall])
       //  cube([h_distance, 2*clamp_total_r - ST, wall]);
       //translate([-h_distance, -clamp_total_r, 0])
-      //  cube([wall, 2*clamp_total_r - ST, clamp_h]);
+      //  cube([vsupp, 2*clamp_total_r - ST, clamp_h]);
 
       //motor_mount
       translate([-h_distance, clamp_total_r - ST, 0])
         cube([wall, l_distance + screw_mount/2 + screw_clearance,
               screw_mount + 2*screw_clearance + 2*wall]);
+      difference() {
+        translate([wall,0,0]) rotate([0,0,angle]) union() {
+          cube([h_distance/abs(cos(angle)), wall, wall]);
+          translate([0,0,clamp_h-wall])
+            cube([h_distance/abs(cos(angle)), wall, wall]);
+        }
+      }
 
     }
     translate([0,0,-1])
