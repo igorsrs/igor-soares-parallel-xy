@@ -106,8 +106,8 @@ module xy_linear_bushing_housing(
                      i*vertical_screws_separation/2])
          rotate([45,0,0])
            cube([wall,
-                 (wall + 2*vertical_screw_head_r)/cos(45),
-                 (wall + 2*vertical_screw_head_r)/cos(45)],
+                 (lwall + 2*vertical_screw_head_r)/cos(45),
+                 (lwall + 2*vertical_screw_head_r)/cos(45)],
                  center=true);
       translate([-bushing_r - lwall, -bushing_r -lwall, 0])
         cube([wall,

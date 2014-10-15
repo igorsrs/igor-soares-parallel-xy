@@ -19,17 +19,17 @@
 
 include <configuration.scad>
 
-HOTEND_POSITION = [ 35, 40];
+HOTEND_POSITION = [ 20, 20];
 HOTEND_HOLE = 35;
 HOTEND_SCREW_DISTANCE = 25;
 EXTRUDER_SCREWS = 4.5;
-EXTRUDER_SCEWS_NUT_WIDTH = 8.5;
+EXTRUDER_SCEWS_NUT_WIDTH = 7.2;
 EXTRUDER_SCEWS_NUT_H = 4;
-X_SCREWS_POSITIONS = [-20, 70];
-Y_SCREWS_POSITIONS = [-20, 80];
+X_SCREWS_POSITIONS = [-15, 55];
+Y_SCREWS_POSITIONS = [-15, 55];
 BUSHING_HOUSING_SCREW_DIAMETER = 5.4;
 
-xy_car_base($fn=64, extruder_angle=43);
+xy_car_base($fn=64, extruder_angle=45);
 
 module xy_car_base(
   wall=WALL_WIDTH,
