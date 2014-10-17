@@ -20,7 +20,8 @@
 include <configuration.scad>
 use <linear_bushing_housing.scad>
 
-xy_linear_bushing_housing($fn=64);
+flex_clamp($fn=64);
+//xy_linear_bushing_housing($fn=64);
 
 module xy_linear_bushing_housing(
     wall=WALL_WIDTH,
@@ -71,6 +72,43 @@ module xy_linear_bushing_housing(
       #cylinder(r=bushing_r, h=bushing_l);
     translate([total_len - bushing_l -lwall, -lwall - bushing_r -1, -1])
       #cube([bushing_l, 2*(lwall + bushing_r) +2, lwall + extra_gap + 1]);
+  }
+}
+
+module flex_clamp(
+  wall=WALL_WIDTH,
+  lwall=LIGHT_WALL_WIDTH,
+  extra_gap=1,
+  bushing_r=8.3/2,
+  bushing_l=7.9,
+  screw_r=3.7/2,
+  screw_head_r=9.5/2)
+{
+  difference() {
+    union() {
+      translate([-bushing_r - 2*lwall, -bushing_r -lwall, 0])
+        cube([2*(bushing_r + 2*lwall) + screw_head_r + screw_r + lwall,
+              2*bushing_r + lwall + wall -extra_gap,
+              bushing_l]);
+    }
+    translate([0,0,-1])
+      #cylinder(r=bushing_r, h=bushing_l+2);
+    translate([-bushing_r - lwall, 0, -1])
+      #cube([2*(bushing_r + lwall),
+             bushing_r - lwall + wall -extra_gap,
+             bushing_l +2]);
+    translate([0, -bushing_r + lwall, -1])
+      #cube([2*(bushing_r + 2*lwall) + screw_head_r + screw_r + lwall,
+             bushing_r + ST,
+             bushing_l +2]);
+    translate([bushing_r + lwall + screw_head_r + screw_r,
+               bushing_r + wall +1,
+               bushing_l/2]) rotate([90,0,0])
+      #cylinder(r=screw_r, h=2*bushing_r + 2*lwall + wall);
+    translate([bushing_r + lwall + screw_head_r + screw_r,
+               bushing_r + wall/2 +1,
+               bushing_l/2]) rotate([90,0,0])
+      #cube([2*screw_head_r, 2*screw_head_r, 1+wall], center=true);
   }
 }
 
