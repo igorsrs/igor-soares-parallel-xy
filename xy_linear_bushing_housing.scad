@@ -25,170 +25,52 @@ xy_linear_bushing_housing($fn=64);
 module xy_linear_bushing_housing(
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
+    extra_gap=1,
     hsupp=-0.01,
     vsupp=VERTICAL_SUPPORT_WALL,
     screw_r=3.7/2,
     screw_nut_width=6.7,
-    bushing_r=LINEAR_BUSHING_DIAMETER/2,
-    bushing_l=LINEAR_BUSHING_LEN,
-    bushing_wall=LINEAR_BUSHING_WALL,
-    total_len=100,
+    bushing_r=10.4/2,
+    bushing_l=8.3,
+    bushing_wall=0.5,
+    total_len=125,
     bed_screw_r=3.7/2,
     bed_screws_room=6,
     bed_screws_separation=40,
-    vertical_screws_separation=70,
-    vertical_screw_r=5.7/2,
-    vertical_screw_head_r=12/2,
+    vertical_screws_separation=85,
+    vertical_screw_r=5.2/2,
+    vertical_screw_head_r=13/2,
     support_h=30)
 {
-  bushings_separation = total_len - 2*bushing_l - 4*bushing_wall;
-  bed_base_len = bushing_r + lwall + bed_screws_room + bed_screws_separation +
-                 bed_screws_room;
-  screws_pos = [
-    [
-      -(bushing_r + lwall + bed_screws_room),
-      bushing_r + lwall + bed_screws_room,
-      0
-    ], [
-      -bed_screws_separation - (bushing_r + lwall + bed_screws_room),
-      bushing_r + lwall + bed_screws_room,
-      0
-    ]
-  ];
-
 
   difference() {
     union() {
-      linear_bushing_housing_positive(
-        wall=wall,
-        lwall=lwall,
-        hsupp=hsupp,
-        vsupp=vsupp,
-        screw_r=screw_r,
-        screw_nut_width=screw_nut_width,
-        bushing_r=bushing_r,
-        bushing_l=bushing_l,
-        bushing_wall=bushing_wall,
-        num_screws=1);
-
-      translate([0, 0, bushing_l + 2*bushing_wall - ST])
-        linear_bushing_housing_positive(
-          wall=wall,
-          lwall=lwall,
-          hsupp=hsupp,
-          vsupp=vsupp,
-          screw_r=screw_r,
-          screw_nut_width=screw_nut_width,
-          bushing_r=bushing_r,
-          bushing_l=bushings_separation - 2*bushing_wall + 2*ST,
-          bushing_wall=bushing_wall,
-          num_screws=0);
-
-      translate([0, 0, 2*(bushing_l + 2*bushing_wall) + bushings_separation])
-        mirror([0,0,1])
-          linear_bushing_housing_positive(
-            wall=wall,
-            lwall=lwall,
-            hsupp=hsupp,
-            vsupp=vsupp,
-            screw_r=screw_r,
-            screw_nut_width=screw_nut_width,
-            bushing_r=bushing_r,
-            bushing_l=bushing_l,
-            bushing_wall=bushing_wall,
-            num_screws=1);
-
+      translate([0, - lwall - bushing_r, 0])
+        cube([total_len, 2*(lwall + bushing_r), bushing_r + wall - lwall]);
       for(i=[-1,1])
-        translate([
-                   -bushing_r - lwall + wall/2,
-                   -bushing_r - lwall,
-                   bushing_l + 2*bushing_wall + bushings_separation/2 -
-                     i*vertical_screws_separation/2])
-         rotate([45,0,0])
-           cube([wall,
-                 (lwall + 2*vertical_screw_head_r)/cos(45),
-                 (lwall + 2*vertical_screw_head_r)/cos(45)],
-                 center=true);
-      translate([-bushing_r - lwall, -bushing_r -lwall, 0])
-        cube([wall,
-              bushing_r + lwall,
-              2*bushing_wall + 2*bushing_l + bushings_separation]);
+        translate([total_len/2 - i*vertical_screws_separation/2, 0, 0])
+          difference()
+      {
+        union() {
+          translate([-wall-vertical_screw_r, 0, 0])
+            cube([2*(wall + vertical_screw_r), bushing_r + lwall + vertical_screw_head_r, wall]);
+          translate([0, bushing_r + lwall + vertical_screw_head_r - ST, 0])
+            cylinder(r=wall + vertical_screw_r, h=wall);
+        }
+        translate([0, bushing_r + lwall + vertical_screw_head_r - ST, -1])
+          #cylinder(r= vertical_screw_r, h=wall+2);
+      }
     }
-    linear_bushing_housing_negative(
-      wall=wall,
-      lwall=lwall,
-      hsupp=hsupp,
-      vsupp=vsupp,
-      screw_r=screw_r,
-      screw_nut_width=screw_nut_width,
-      bushing_r=bushing_r,
-      bushing_l=bushing_l,
-      bushing_wall=bushing_wall,
-      num_screws=1);
-    translate([0, 0, bushing_l + 2*bushing_wall - ST])
-      linear_bushing_housing_negative(
-        wall=wall,
-        lwall=lwall,
-        hsupp=hsupp,
-        vsupp=vsupp,
-        screw_r=screw_r,
-        screw_nut_width=screw_nut_width,
-        bushing_r=bushing_r,
-        bushing_l=bushings_separation - 2*bushing_wall + 2*ST,
-        bushing_wall=bushing_wall,
-        num_screws=0);
-    translate([0, 0, 2*(bushing_l + 2*bushing_wall) + bushings_separation])
-      mirror([0,0,1])
-        linear_bushing_housing_negative(
-          wall=wall,
-          lwall=lwall,
-          hsupp=hsupp,
-          vsupp=vsupp,
-          screw_r=screw_r,
-          screw_nut_width=screw_nut_width,
-          bushing_r=bushing_r,
-          bushing_l=bushing_l,
-          bushing_wall=bushing_wall,
-          num_screws=1);
-
-    translate([bushing_r,
-               -(bushing_r + lwall) -1,
-               bushing_l + 2*bushing_wall + bushings_separation/2 -
-                   vertical_screws_separation/2])
-      #cube([screw_r +1,
-             2*(bushing_r + lwall) +2,
-             vertical_screws_separation]);
-    translate([bushing_r,
-               -(bushing_r + lwall) -1,
-               bushing_l + 2*bushing_wall + bushings_separation/2 -
-                   vertical_screws_separation/2])
-      rotate([0,45,0])
-        #cube([screw_r +1,
-               2*(bushing_r + lwall) +2,
-               2*screw_r]);
-    translate([bushing_r,
-               -(bushing_r + lwall) -1,
-               bushing_l + 2*bushing_wall + bushings_separation/2 +
-                   vertical_screws_separation/2])
-      rotate([0,45,0])
-        #cube([screw_r +1,
-               2*(bushing_r + lwall) +2,
-               2*screw_r]);
-
-    for(i=[-1,1])
-      translate([
-                 -bushing_r - lwall + wall/2,
-                 -bushing_r - lwall - vertical_screw_head_r,
-                 bushing_l + 2*bushing_wall + bushings_separation/2 -
-                   i*vertical_screws_separation/2])
-       rotate([0,90,0])
-         #cylinder(r=vertical_screw_r, h=wall+1, center=true);
-
-    translate([0,0,-ST]) mirror([0,0,1])
-      #cylinder(r=bushing_r + lwall + vertical_screw_head_r + wall,
-               h=bushing_l);
-    translate([0,0,2*(bushing_l + 2*bushing_wall) + bushings_separation+ST])
-      #cylinder(r=bushing_r + lwall + vertical_screw_head_r + wall,
-               h=bushing_l);
+    translate([-1, 0, wall + bushing_r]) rotate([0,90,0])
+      #cylinder(r=bushing_r - bushing_wall, h=total_len +2);
+    translate([lwall, 0, wall + bushing_r]) rotate([0,90,0])
+      #cylinder(r=bushing_r, h=bushing_l);
+    translate([lwall, -lwall - bushing_r -1, -1])
+      #cube([bushing_l, 2*(lwall + bushing_r) +2, lwall + extra_gap + 1]);
+    translate([total_len - lwall, 0, wall + bushing_r]) rotate([0,-90,0])
+      #cylinder(r=bushing_r, h=bushing_l);
+    translate([total_len - bushing_l -lwall, -lwall - bushing_r -1, -1])
+      #cube([bushing_l, 2*(lwall + bushing_r) +2, lwall + extra_gap + 1]);
   }
 }
+
