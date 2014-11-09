@@ -26,13 +26,13 @@ include <configuration.scad>
 //    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
 //);
 
-mirror([0,1,0])
-sliding_block_bushing_clamp(
-    wire_clamp=true,
-    $fn=64,
-    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
-);
+//mirror([0,1,0])
+//sliding_block_bushing_clamp(
+//    wire_clamp=true,
+//    $fn=64,
+//    wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
+//    wire_h=LIGHT_WALL_WIDTH + 3*BEARING_WIDTH/2 + 2
+//);
 
 //sliding_block_rod_clamp(
 //    wire_clamp=true,
@@ -49,7 +49,7 @@ sliding_block_bushing_clamp(
 //);
 
 //translate([0,-5,0])
-//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
+wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
 
 module wire_guide(
         wall=1,
@@ -409,8 +409,9 @@ module wire_spool(
         cylinder(r2=screw_r + wall, r1=screw_r + lwall, h=wall/2 + ST);
 
       //wire knot place
+      for (a=[0,180]) rotate([0,0,a])
       translate([0, 0, 0])
-        cube([lwall, screw_r + wall + lwall, lwall]);
+        cube([wall, screw_r + 2*wall, lwall]);
     }
     translate([0,0,-1])
       #cylinder(r=screw_r, h=lwall + wall + 2);

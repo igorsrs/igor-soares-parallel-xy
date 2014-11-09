@@ -20,8 +20,8 @@
 include <configuration.scad>
 use <linear_bushing_housing.scad>
 
-flex_clamp($fn=64);
-//xy_linear_bushing_housing($fn=64);
+//flex_clamp($fn=64);
+xy_linear_bushing_housing($fn=64);
 
 module xy_linear_bushing_housing(
     wall=WALL_WIDTH,
@@ -64,6 +64,8 @@ module xy_linear_bushing_housing(
     }
     translate([-1, 0, wall + bushing_r]) rotate([0,90,0])
       #cylinder(r=bushing_r - bushing_wall, h=total_len +2);
+    translate([bushing_l  + 2*lwall, -bushing_r, -1])
+      #cube([total_len - 2*(bushing_l + 2*lwall), 2*bushing_r, wall - lwall +1]);
     translate([lwall, 0, wall + bushing_r]) rotate([0,90,0])
       #cylinder(r=bushing_r, h=bushing_l);
     translate([lwall, -lwall - bushing_r -1, -1])
