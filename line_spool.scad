@@ -24,16 +24,16 @@ PI=3.141592;
 
 THREAD_PITCH = 2;
 THREAD_ANGLE = 45;
-INNER_DIAMETER = 70./PI;
+INNER_DIAMETER = 40./PI;
 DEFAILT_SPOOL_H=16;
-INNER_SHAFT_DIAMETER = 5.5;
+INNER_SHAFT_DIAMETER = 5.3;
 
 $fn=64;
 line_spool();
 
 module line_spool(
         lwall=LIGHT_WALL_WIDTH,
-        wall=WALL_WIDTH,
+        wall=LIGHT_WALL_WIDTH + 0.01,
         hsupp=HORIZONTAL_SUPPORT_WALL,
         vsupp=VERTICAL_SUPPORT_WALL,
         thread_inner_diameter=INNER_DIAMETER,
@@ -41,11 +41,11 @@ module line_spool(
         thread_angle=THREAD_ANGLE,
         spool_h=DEFAILT_SPOOL_H,
         inner_shaft_diameter=INNER_SHAFT_DIAMETER,
-        screw_r=3.7/2,
-        screw_head_r=6.5/2,
-        screw_nut_width=7.0,
+        screw_r=3.2/2,
+        screw_head_r=5./2,
+        screw_nut_width=5.3,
         screw_nut_h=1.5,
-        wire_hole=1.5)
+        wire_hole=1.1)
 {
   outer_diameter = thread_inner_diameter + (thread_pitch/2)*cos(thread_angle);
   clamp_h = 2*screw_head_r + 2*lwall;
