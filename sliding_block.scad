@@ -428,6 +428,7 @@ module base_sliding_block_positive(
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
     rod_distance=LIGHT_WALL_WIDTH,
+    bushings_distance=3.0,
     screw_r=3.7/2,
     screw_nut_width=6.7,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
@@ -436,29 +437,23 @@ module base_sliding_block_positive(
 {
   is_double = true;
   rod_clamp_h = is_double ? 2*(lwall + screw_r)/cos(45) : 0;
+  h = 2*bushing_l + 2*lwall + bushings_distance;
 
   union() {
     //bushing
-    cylinder(r=bushing_r + lwall, h=bushing_l + 2*lwall);
-    translate([0, -bushing_r - lwall, 0])
-      cube([(bushing_r + screw_r),
+    translate([-bushing_wall, 0, 0])
+      cylinder(r=bushing_r + lwall, h=h);
+    translate([-bushing_wall, -bushing_r - lwall, 0])
+      cube([(bushing_r + screw_r) +bushing_wall,
             2*(bushing_r + lwall),
-            bushing_l + 2*lwall]);
+            h]);
     //bushing screw
-    translate([(bushing_r + screw_r),
-               0,
-               (lwall+screw_r)/cos(45)])
-      rotate([0,45,0])
-        cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
-             center=true);
-
-    if(is_double)
-      translate([(bushing_r + screw_r),
-                 0,
-                 bushing_l + 2*bushing_wall - (lwall+screw_r)/cos(45)])
+    for(hpos=[(lwall+screw_r)/cos(45), h/2, h - (lwall+screw_r)/cos(45)]) {
+      translate([(bushing_r + screw_r), 0, hpos])
         rotate([0,45,0])
           cube([2*(screw_r + lwall), 2*(bushing_r + lwall), 2*(screw_r + lwall)],
                center=true);
+    }
 
     //rod clamp
     translate([-bushing_r - lwall,
@@ -507,6 +502,7 @@ module base_sliding_block_negative(
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
     rod_distance=LIGHT_WALL_WIDTH,
+    bushings_distance=3.0,
     screw_r=3.7/2,
     screw_head_r=7.5/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
@@ -515,6 +511,7 @@ module base_sliding_block_negative(
 {
   is_double = true;
   rod_clamp_h = is_double ? 2*(lwall + screw_r)/cos(45) : 0;
+  h = 2*bushing_l + 2*lwall + bushings_distance;
 
   union() {
     //rod
@@ -548,18 +545,20 @@ module base_sliding_block_negative(
 
     //bushing
     translate([0,0,-1])
-      cylinder(r=bushing_r - bushing_wall, h=bushing_l + 2*lwall +2);
-    translate([0,0,lwall])
-      cylinder(r=bushing_r, h=bushing_l);
-    translate([0,0,2*lwall])
-      cylinder(r=bushing_r + bushing_wall,
-               h=bushing_l - 2*lwall - bushing_wall);
-    translate([0,0,lwall + bushing_l - lwall - bushing_wall - ST])
-      cylinder(r1=bushing_r + bushing_wall,
-               r2=bushing_r,
-               h=bushing_wall);
-    translate([0,0,lwall+bushing_l-ST])
-      cylinder(r1=bushing_r, r2=bushing_r-bushing_wall, h=bushing_wall);
+      cylinder(r=bushing_r - bushing_wall, h=h +2);
+    for(i=[0, bushing_l +  bushings_distance]) translate([0,0,i]) {
+      translate([0,0,lwall])
+        #cylinder(r=bushing_r, h=bushing_l);
+      translate([0,0,2*lwall])
+        #cylinder(r=bushing_r + bushing_wall,
+                 h=bushing_l - 2*lwall - bushing_wall);
+      translate([0,0,lwall + bushing_l - lwall - bushing_wall - ST])
+        #cylinder(r1=bushing_r + bushing_wall,
+                 r2=bushing_r,
+                 h=bushing_wall);
+      translate([0,0,lwall+bushing_l-ST])
+        #cylinder(r1=bushing_r - ST, r2=bushing_r-bushing_wall, h=bushing_wall);
+    }
 
     //bushing access
     translate([0, -bushing_r + bushing_wall, 0])
@@ -568,7 +567,7 @@ module base_sliding_block_negative(
       translate([0,0,-1])
         cube([(bushing_r + lwall) + (2*screw_r + wall)/cos(45) +1,
                2*(bushing_r -bushing_wall),
-               bushing_l + 2*lwall +2]);
+               h +2]);
     }
 
     //bushing screw
@@ -578,12 +577,11 @@ module base_sliding_block_negative(
       rotate([90,0,0])
         cylinder(r=screw_r, h=2*bushing_r + 2*lwall +2, center=true);
 
-    if(is_double)
-      translate([(bushing_r + screw_r),
-                 0,
-                 bushing_l + 2*bushing_wall - (lwall+screw_r)/cos(45)])
+    for(hpos=[(lwall+screw_r)/cos(45), h/2, h - (lwall+screw_r)/cos(45)]) {
+      translate([(bushing_r + screw_r), 0, hpos])
         rotate([90,0,0])
           cylinder(r=screw_r, h=2*bushing_r + 2*lwall +2, center=true);
+    }
   }
 }
 
@@ -593,6 +591,8 @@ module base_sliding_block(
     hsupp=HORIZONTAL_SUPPORT_WALL,
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
+    rod_distance=2.0,
+    bushings_distance=50,
     screw_r=3.7/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
@@ -605,6 +605,8 @@ module base_sliding_block(
         hsupp=hsupp,
         vsupp=vsupp,
         rod_r=rod_r,
+        rod_distance=rod_distance,
+        bushings_distance=bushings_distance,
         screw_r=screw_r,
         bushing_r=bushing_r,
         bushing_l=bushing_l,
@@ -616,6 +618,8 @@ module base_sliding_block(
         hsupp=hsupp,
         vsupp=vsupp,
         rod_r=rod_r,
+        rod_distance=rod_distance,
+        bushings_distance=bushings_distance,
         screw_r=screw_r,
         bushing_r=bushing_r,
         bushing_l=bushing_l,
