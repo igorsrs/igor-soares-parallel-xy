@@ -559,6 +559,12 @@ module base_sliding_block_negative(
       translate([0,0,lwall+bushing_l-ST])
         #cylinder(r1=bushing_r - ST, r2=bushing_r-bushing_wall, h=bushing_wall);
     }
+    translate([0,0,2*lwall + bushing_l])
+      cylinder(r=bushing_r, h=bushings_distance - 2*lwall - bushing_wall);
+    translate([0,0,bushing_l + bushings_distance - bushing_wall - ST])
+      cylinder(r1=bushing_r - ST,
+               r2=bushing_r - bushing_wall + ST,
+               h=bushing_wall);
 
     //bushing access
     translate([0, -bushing_r + bushing_wall, 0])
