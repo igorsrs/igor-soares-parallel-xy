@@ -33,85 +33,6 @@ sliding_block_rod_clamp(
     wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
 );
 
-//translate([0,-5,0])
-//wire_spool($fn=64, wall=(WALL_WIDTH + LIGHT_WALL_WIDTH)/2);
-
-module wire_guide(
-        wall=1,
-        lwall=1,
-        vsupp = 0.5,
-        hsupp=0.4,
-        screw_r=1,
-        sc_head_r=20,
-        x_pos=1,
-        y_len=30,
-        nut_width=8.0,
-        nut_h=2.5,
-        wire_hole=1.5,
-        h=10)
-{
-  l = -x_pos + wall;
-
-  difference() {
-    union() {
-      translate([0,y_len - lwall, 0])
-        cube([l, 2*sc_head_r + 2*lwall, h + wire_hole + wall]);
-      translate([l, y_len + sc_head_r, 0])
-        cylinder(r=sc_head_r, h=h + wire_hole + wall);
-    }
-    translate([l, y_len + sc_head_r, nut_h -1])
-      #cylinder(r=screw_r, h=h+ wire_hole + wall + 1);
-    translate([l, y_len + sc_head_r, -1])
-      #cylinder(r=nut_width/sqrt(3), h=nut_h+1, $fn=6);
-    translate([-1, y_len - ST, -1]) mirror([0,1,0])
-      #cube([2*l +2, lwall, wire_hole + h + 1]);
-    translate([-1, y_len  + 2*sc_head_r + ST, -1])
-      #cube([2*l +2, lwall, wire_hole + h + 1]);
-  }
-}
-
-module screw_wall(
-         wall=5,
-         lwall=2,
-         vsupp=-0.1,
-         screw_r=2,
-         screw_head_r=4,
-         screw_nut_width=7,
-         screw_nut_h = 3.5,
-         screws_separation  = 10,
-         total_len = 20)
-{
-  w = 2*screw_head_r + 2*wall;
-
-  screws_block_l = screws_separation + screw_nut_width/cos(30);
-
-  difference() {
-    union() {
-      cube([w, wall + screw_nut_h, total_len]);
-    }
-    translate([w/2, -1, total_len/2]) rotate([-90,0,0])
-      #cylinder(r=screw_head_r, h=screw_nut_h + wall + 2);
-
-    translate([w/2, vsupp, total_len/2])
-      rotate([-90,0,0])
-        union()
-    {
-      for(i=[-1,1]) translate([0, i*screws_separation/2, 0]) union() {
-        //rotate([0,0,30])
-        //  #cylinder(r=screw_nut_width/(2*cos(30)), h=screw_nut_h -vsupp, $fn=6);
-        translate([0,0,screw_nut_h])
-          #cylinder(r=screw_r, h=wall - 2*vsupp);
-      }
-      translate([-screw_r, -screws_separation/2, screw_nut_h])
-        #cube([2*screw_r, screws_separation, wall -2*vsupp]);
-      translate([-screw_nut_width/2,
-                 -screws_block_l/2,
-                 0])
-        #cube([screw_nut_width, screws_block_l, screw_nut_h -vsupp]);
-    }
-  }
-}
-
 module sliding_block_rod_clamp(
     wire_clamp=false,
     wall=WALL_WIDTH,
@@ -138,6 +59,7 @@ module sliding_block_rod_clamp(
     strech_screw_nut_width=8.0,
     strech_screw_nut_h=3.0,
     strech_screw_length=50.0,
+    strech_support_wall=2*WALL_WIDTH + ROD_CLAMP_SCREW_DIAMETER,
     bushing_wall=LINEAR_BUSHING_WALL)
 {
   wire_h_pos = 3*rod_r + wire_h;
@@ -153,10 +75,13 @@ module sliding_block_rod_clamp(
   screw_wall_pos = (wire_pos_from_bearing_center > 0 ) ?
                       wire_wall_pos - 2*strech_screw_head_r - wall - ST :
                       wire_wall_pos;
-  screw_wall_h = wire_h_pos + wire_hole/2 + wall;
+  screw_wall_h = strech_support_wall + wire_hole/2 + wall;
   strech_screws_pos = lwall + strech_screw_head_r;
   strech_screws_distance = 15;
   strech_screw_hole_pos = (-strech_screws_pos + vsupp)/2;
+
+  housing_r = bushing_r + lwall + bushing_wall;
+  total_h = 2*lwall + 2*bushing_l + bushings_distance;
 
   difference() {
     union() {
@@ -180,12 +105,25 @@ module sliding_block_rod_clamp(
             %cylinder(r=1, h=strech_screw_length + wall +2);
 
           //wire contact wall
-          translate([wire_wall_pos, bushing_r + lwall + bushing_wall - 2*wall, 0])
+          translate([wire_wall_pos,
+                     wire_h_pos - wire_hole/2 - wall,
+                     0])
+            cube([wall, screw_wall_h, total_h/2 + wall]);
+          translate([wire_wall_pos, 0, 0])
+            cube([wall, wire_h_pos, wall]);
+          translate([wire_wall_pos,
+                     wire_h_pos - (screw_wall_h - wire_hole/2 - wall),
+                     total_h/2 - wall])
             cube([wall,
-                 -(bushing_r + lwall + bushing_wall - 2*wall) + screw_wall_h,
-                 strech_screw_length + wall]);
-          translate([0, bushing_r + lwall + bushing_wall - 2*wall, 0])
-            cube([wire_y_pos + wall, 2*wall, bushing_l + 2*bushing_wall]);
+                  screw_wall_h,
+                  total_h/2 + wall]);
+          //support
+          translate([wire_wall_pos + wall - vsupp - ST, -housing_r, 0])
+            cube([vsupp, housing_r + wire_h_pos - wall/2, total_h]);
+
+          for(hs=[0, total_h/2 - wall, total_h - wall])
+            translate([0, -housing_r, hs])
+              cube([wire_y_pos + wall, 2*housing_r, wall]);
           //if (wire_pos_from_bearing_center < 0)
           //  translate([0, bushing_r - lwall- ST, 2*lwall + 2*rod_r - ST])
           //    cube([wire_y_pos + wall, lwall + 2*rod_r + vsupp, lwall]);
@@ -207,43 +145,12 @@ module sliding_block_rod_clamp(
         bushing_wall=bushing_wall);
 
     rotate([0,0,180])
-      translate([wire_y_pos, wire_h_pos - wire_hole/2, strech_screw_length])
+      translate([wire_y_pos, wire_h_pos - wire_hole/2, total_h/2 - wire_hole/2])
         mirror([(wire_pos_from_bearing_center >0) ? 1 : 0,0,0])
           translate([-ST,0,0])
             #cube([wall + 2*ST, wire_hole, wire_hole]);
   }
 
-}
-
-module wire_spool(
-    wall=WALL_WIDTH,
-    lwall=LIGHT_WALL_WIDTH,
-    hsupp=HORIZONTAL_SUPPORT_WALL,
-    vsupp=VERTICAL_SUPPORT_WALL,
-    rod_r=ROD_HOLE_DIAMETER/2,
-    screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
-    strech_screws_distance = 15,
-    screw_head_r=11.4/2,
-    wire_hole=1)
-{
-  difference() {
-    union() {
-      cylinder(r=screw_r + wall, h=lwall + ST);
-      translate([0,0,lwall - ST])
-        cylinder(r1=screw_r + wall, r2=screw_r + lwall, h=wall/2 + 2*ST);
-      translate([0,0,lwall + wall/2 - ST])
-        cylinder(r2=screw_r + wall, r1=screw_r + lwall, h=wall/2 + ST);
-
-      //wire knot place
-      for (a=[0,180]) rotate([0,0,a])
-      translate([0, 0, 0])
-        cube([wall, screw_r + 2*wall, lwall]);
-    }
-    translate([0,0,-1])
-      #cylinder(r=screw_r, h=lwall + wall + 2);
-    translate([0,0,-1])
-      #cylinder(r=screw_r, h=lwall + wall + 2);
-  }
 }
 
 module base_sliding_block_positive(
