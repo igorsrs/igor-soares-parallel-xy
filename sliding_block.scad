@@ -30,7 +30,9 @@ sliding_block_rod_clamp(
     wire_clamp=true,
     $fn=64,
     wire_pos_from_bearing_center=-BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1
+    wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 1,
+    second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
+                  3*BEARING_WIDTH/2 + 1.5
 );
 
 module sliding_block_rod_clamp(
@@ -50,19 +52,17 @@ module sliding_block_rod_clamp(
     bushing_l=LINEAR_BUSHING_LEN,
     bushings_distance=50.0,
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
-    wire_h=LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5,
+    wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5,
+    second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
+                  2*BEARING_WIDTH/2 +1.5,
     wire_hole=1.5,
-    strech_screw_r=ROD_CLAMP_SCREW_DIAMETER/2,
+    strech_screw_r=4.3/2,
     strech_screw_head_r=11.4/2,
-    strech_screw_nut_access_room=9.5,
-    strech_screw_nut_access_h=5,
-    strech_screw_nut_width=8.0,
-    strech_screw_nut_h=3.0,
     strech_screw_length=50.0,
-    strech_support_wall=2*WALL_WIDTH + ROD_CLAMP_SCREW_DIAMETER,
+    strech_support_wall=2*WALL_WIDTH + 4.3,
     bushing_wall=LINEAR_BUSHING_WALL)
 {
-  wire_h_pos = 3*rod_r + wire_h;
+  wire_h_pos = wire_h;
 
   inner_pos = (rod_r + bearing_pos + bearing_screw_r);
   second_pos = -(2*bearing_r) + inner_pos;
@@ -100,10 +100,6 @@ module sliding_block_rod_clamp(
 
       rotate([0,0,180])
         union() {
-          //wire representation
-          translate([wire_y_pos, wire_h_pos, -1])
-            %cylinder(r=1, h=strech_screw_length + wall +2);
-
           //wire contact wall
           translate([wire_wall_pos,
                      wire_h_pos - wire_hole/2 - wall,
@@ -117,9 +113,69 @@ module sliding_block_rod_clamp(
             cube([wall,
                   screw_wall_h,
                   total_h/2 + wall]);
+
+          //strech_screws support
+          translate([wire_wall_pos,
+                     wire_h_pos - wire_hole/2 - wall +
+                       (screw_wall_h - strech_support_wall),
+                     0])
+            cube([strech_support_wall + wall, strech_support_wall, wall]);
+          translate([wire_wall_pos,
+                     wire_h_pos - wire_hole/2 - wall +
+                       (screw_wall_h - strech_support_wall) - lwall + ST,
+                     0]) difference()
+          {
+            cube([strech_support_wall + wall, lwall,
+                  strech_support_wall + 2*wall]);
+            translate([strech_support_wall + wall, -ST, wall + ST])rotate([0,-45,0])
+              cube([2*strech_support_wall + wall,
+                    lwall + 2*ST,
+                    2*strech_support_wall + wall]);
+          }
+          translate([wire_wall_pos,
+                     wire_h_pos - wire_hole/2 - wall +
+                       (screw_wall_h) - ST,
+                     0]) difference()
+          {
+            cube([strech_support_wall + wall, lwall,
+                  strech_support_wall + 2*wall]);
+            translate([strech_support_wall + wall, -ST, wall+ST])rotate([0,-45,0])
+              cube([2*strech_support_wall + wall,
+                    lwall + 2*ST,
+                    2*strech_support_wall + wall]);
+          }
+
+          //upper
+          translate([wire_wall_pos,
+                     wire_h_pos - strech_support_wall,
+                     total_h]) mirror([0,0,1])
+            cube([strech_support_wall + wall, strech_support_wall, wall]);
+          translate([wire_wall_pos,
+                     wire_h_pos -ST,
+                     total_h]) mirror([0,0,1]) difference()
+          {
+            cube([strech_support_wall + wall, lwall,
+                  strech_support_wall + 2*wall]);
+            translate([strech_support_wall + wall, -ST, wall + ST])rotate([0,-45,0])
+              cube([2*strech_support_wall + wall,
+                    lwall + 2*ST,
+                    2*strech_support_wall + wall]);
+          }
+          translate([wire_wall_pos,
+                     wire_h_pos - strech_support_wall - lwall +ST,
+                     total_h]) mirror([0,0,1]) difference()
+          {
+            cube([strech_support_wall + wall, lwall,
+                  strech_support_wall + 2*wall]);
+            translate([strech_support_wall + wall, -ST, wall+ST])rotate([0,-45,0])
+              cube([2*strech_support_wall + wall,
+                    lwall + 2*ST,
+                    2*strech_support_wall + wall]);
+          }
+
           //support
-          translate([wire_wall_pos + wall - vsupp - ST, -housing_r, 0])
-            cube([vsupp, housing_r + wire_h_pos - wall/2, total_h]);
+          //translate([wire_wall_pos + wall - vsupp - ST, -housing_r, 0])
+          //  cube([vsupp, housing_r + wire_h_pos - wall/2, total_h]);
 
           for(hs=[0, total_h/2 - wall, total_h - wall])
             translate([0, -housing_r, hs])
@@ -144,11 +200,30 @@ module sliding_block_rod_clamp(
         bushings_distance=bushings_distance,
         bushing_wall=bushing_wall);
 
-    rotate([0,0,180])
+    rotate([0,0,180]) union(){
       translate([wire_y_pos, wire_h_pos - wire_hole/2, total_h/2 - wire_hole/2])
         mirror([(wire_pos_from_bearing_center >0) ? 1 : 0,0,0])
           translate([-ST,0,0])
             #cube([wall + 2*ST, wire_hole, wire_hole]);
+
+      //wire representation
+      translate([wire_y_pos, wire_h_pos, -1])
+        %cylinder(r=1, h=total_h +2);
+
+      translate([wire_y_pos, second_wire_h, -1])
+        cylinder(r=wire_hole/2, h=total_h +2);
+
+      translate([wire_wall_pos + wall + strech_support_wall/2,
+                 wire_h_pos - wire_hole/2 - wall +
+                   (screw_wall_h - strech_support_wall) + strech_support_wall/2,
+                 -1])
+        #cylinder(r=strech_screw_r, h=wall+2);
+      translate([wire_wall_pos + wall + strech_support_wall/2,
+                 wire_h_pos - strech_support_wall + strech_support_wall/2,
+                 total_h - wall + hsupp])
+        #cylinder(r=strech_screw_r, h=wall+2);
+    }
+
   }
 
 }
