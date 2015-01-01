@@ -57,10 +57,10 @@ module sliding_block_rod_clamp(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   2*BEARING_WIDTH/2 +1.5,
     wire_hole=1.5,
-    strech_screw_r=4.3/2,
+    strech_screw_r=5.0/2,
     strech_screw_head_r=11.4/2,
     strech_screw_length=50.0,
-    strech_support_wall=2*WALL_WIDTH + 4.3,
+    strech_support_wall=2*4.0 + 5.0,
     bushing_wall=LINEAR_BUSHING_WALL)
 {
   wire_h_pos = wire_h;
@@ -154,16 +154,16 @@ module sliding_block_rod_clamp(
           }
 
           //support
-          for(hs=[0, total_h/2 - lwall/2, total_h - lwall])
+          for(hs=[0, total_h/2 - wall/2, total_h - wall])
             translate([0, -bushing_r, hs]) {
-              linear_extrude(height=lwall, convexity = 10, twist = 0)
+              linear_extrude(height=wall, convexity = 10, twist = 0)
                 polygon(points=[ [bushing_r + wall, -rod_distance - ST],
                                  [wire_y_pos + wall + 2*ST,
                                    wire_h_pos + bushing_r - lwall -
                                    strech_support_wall - wire_hole/2 -ST],
                                  [wire_y_pos + 2*ST,
-                                   wire_h_pos + bushing_r - wire_hole/2 - ST],
-                                 [bushing_supp_pos, 2*bushing_r] ] );
+                                   wire_h_pos + bushing_r - wire_hole - ST],
+                                 [bushing_r + lwall, bushing_r] ] );
           }
         }
 
@@ -190,10 +190,10 @@ module sliding_block_rod_clamp(
             #cube([wall + 2*ST, wire_hole, wire_hole]);
 
       translate([wire_y_pos, wire_h_pos, 2*wall + wire_hole])
-        #cylinder(r=wire_hole/2, h=total_h - 2*wall - wire_hole +1);
+        #cylinder(r=wire_hole, h=total_h - 2*wall - wire_hole +1);
 
       translate([wire_y_pos, second_wire_h, -1])
-        #cylinder(r=wire_hole/2, h=total_h +2);
+        #cylinder(r=wire_hole, h=total_h +2);
     }
   }
 }
