@@ -39,7 +39,7 @@ module sliding_block_rod_clamp(
     wire_clamp=false,
     wall=WALL_WIDTH,
     lwall=LIGHT_WALL_WIDTH,
-    hsupp=HORIZONTAL_SUPPORT_WALL,
+    hsupp=2*HORIZONTAL_SUPPORT_WALL,
     vsupp=VERTICAL_SUPPORT_WALL,
     rod_r=ROD_HOLE_DIAMETER/2,
     rod_distance=3.0,
@@ -60,7 +60,7 @@ module sliding_block_rod_clamp(
     strech_screw_r=5.0/2,
     strech_screw_head_r=11.4/2,
     strech_screw_length=50.0,
-    strech_support_wall=2*4.0 + 5.0,
+    strech_support_wall=2*WALL_WIDTH+ 5.0,
     bushing_wall=LINEAR_BUSHING_WALL)
 {
   wire_h_pos = wire_h;
