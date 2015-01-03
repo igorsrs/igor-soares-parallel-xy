@@ -30,7 +30,7 @@ sliding_block_rod_clamp(
                   3*BEARING_WIDTH/2 + 1.5
 );
 */
-/*
+
 sliding_block_rod_clamp(
     wire_clamp=true,
     $fn=64,
@@ -40,7 +40,6 @@ sliding_block_rod_clamp(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
-*/
 /*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
@@ -52,6 +51,7 @@ sliding_block_rod_clamp_internal(
                   3*BEARING_WIDTH/2 + 1.5
 );
 */
+/*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
     $fn=64,
@@ -61,6 +61,7 @@ sliding_block_rod_clamp_internal(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
+*/
 module sliding_block_rod_clamp_internal(
     wire_clamp=false,
     wall=WALL_WIDTH,
@@ -185,7 +186,7 @@ module sliding_block_rod_clamp(
     screw_head_r=8/2,
     bushing_r=LINEAR_BUSHING_DIAMETER/2,
     bushing_l=LINEAR_BUSHING_LEN,
-    bushings_distance=10.0,
+    bushings_distance=16.0,
     wire_pos_from_bearing_center=BEARING_DIAMETER/2,
     wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH + BEARING_WIDTH/2 + 0.5,
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
@@ -250,8 +251,7 @@ module sliding_block_rod_clamp(
             cube([wall, 2*lwall + 2*strech_support_wall, total_h]);
 
           //strech_screws supports
-          for(param_supp=[ [0,0, -1, 0],
-                           [total_h, 1, hsupp, strech_support_wall + wall] ])
+          for(param_supp=[[total_h, 1, hsupp, strech_support_wall + wall] ])
             translate([wire_wall_pos,
                        wire_h_pos - lwall -strech_support_wall -wire_hole/2 + ST,
                        param_supp[0]])
@@ -278,22 +278,49 @@ module sliding_block_rod_clamp(
                        -1])
               #cylinder(r=strech_screw_r, h=wall -param_supp[2] +1);
           }
-
-          //lower wire path
-          for(py=[0, 2*strech_support_wall + wall])
-            translate([wire_wall_pos + wall - ST,
-                       wire_h_pos - lwall -strech_support_wall -wire_hole/2 +
-                         py + ST,
-                       0])
-              union()
+          translate([wire_wall_pos,
+                     wire_h_pos - lwall -strech_support_wall -wire_hole/2 + ST,
+                     0])
+            difference()
           {
-            translate([-wall,-wall/2 + lwall, wall + wall/2 + wire_hole])
-              rotate([0,90,0]) cylinder(r=wall/2, h=2*wall);
-            translate([wall - vsupp,-wall + lwall, 0])
-              cube([vsupp, wall, wall + wall/2 + wire_hole]);
-            translate([-wall,-wall + lwall, 0])
-              cube([wall, wall, wall + wall/2 + wire_hole]);
+            cube([strech_support_wall + wall,
+                   2*lwall + 2*strech_support_wall,
+                   2*wall + wire_hole]);
+            translate([strech_support_wall + wall, -1, 2*wall + wire_hole + ST])
+              rotate([0,-45,0])
+                cube([2*strech_support_wall + wall,
+                      2*lwall + 2*strech_support_wall+ 2,
+                      2*strech_support_wall + wall]);
+            translate([wall + ST, lwall, 2*wall + wire_hole +ST])
+              cube([2*strech_support_wall + wall,
+                    2*strech_support_wall,
+                    2*strech_support_wall + wall]);
+            translate([wall + strech_support_wall/2,
+                       lwall + strech_support_wall/2,
+                       -1])
+              #cylinder(r=strech_screw_r, h=2*wall + wire_hole +2);
+            translate([wall + strech_support_wall/2,
+                       lwall + 3*strech_support_wall/2,
+                       -1])
+              #cylinder(r=strech_screw_r, h=2*wall + wire_hole +2);
+
+            // wire path holes
+            translate([wall + ST, lwall, -1])
+              #cube([2*wire_hole,
+                     2*strech_support_wall,
+                     wall + wire_hole +1 - ST]);
+            translate([wall + 2*ST, lwall + ST, -1])
+              #cube([2*wire_hole,
+                     2*wire_hole,
+                     2*wall + wire_hole +2]);
+            translate([wall + 2*ST,
+                       lwall + 2*strech_support_wall - 2*wire_hole + ST,
+                       -1])
+              #cube([2*wire_hole,
+                     2*wire_hole,
+                     2*wall + wire_hole +2]);
           }
+
 
           //wire ends
           translate([wire_wall_pos,
