@@ -19,7 +19,7 @@
 
 include <configuration.scad>
 
-/*
+mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
     $fn=64,
@@ -29,8 +29,9 @@ sliding_block_rod_clamp(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-*/
 
+/*
+mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
     $fn=64,
@@ -40,6 +41,7 @@ sliding_block_rod_clamp(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
+*/
 /*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
@@ -246,14 +248,14 @@ module sliding_block_rod_clamp(
         union() {
           //wire contact wall
           translate([wire_wall_pos,
-                     wire_h_pos - lwall - (screw_wall_h - wall),
+                     -bushing_r - rod_distance,
                      0])
             cube([wall, 2*lwall + 2*strech_support_wall, total_h]);
 
           //strech_screws supports
           for(param_supp=[[total_h, 1, hsupp, strech_support_wall + wall] ])
             translate([wire_wall_pos,
-                       wire_h_pos - lwall -strech_support_wall -wire_hole/2 + ST,
+                       -bushing_r - rod_distance,
                        param_supp[0]])
               mirror([0,0, param_supp[1]])
                 difference()
@@ -279,7 +281,7 @@ module sliding_block_rod_clamp(
               #cylinder(r=strech_screw_r, h=wall -param_supp[2] +1);
           }
           translate([wire_wall_pos,
-                     wire_h_pos - lwall -strech_support_wall -wire_hole/2 + ST,
+                     -bushing_r - rod_distance,
                      0])
             difference()
           {
@@ -324,7 +326,7 @@ module sliding_block_rod_clamp(
 
           //wire ends
           translate([wire_wall_pos,
-                     wire_h_pos - lwall -strech_support_wall -wire_hole/2 + ST,
+                     -bushing_r - rod_distance,
                      param_supp[0]])
           {
             for(pos_we=[-9*wall/4, -3*wall/4, 3*wall/4, 9*wall/4])
@@ -336,11 +338,10 @@ module sliding_block_rod_clamp(
           //support
           for(hs=[0, total_h/2 - wall/2, total_h - wall])
             translate([0, -bushing_r, hs]) {
-              linear_extrude(height=wall, convexity = 10, twist = 0)
+              #linear_extrude(height=wall, convexity = 10, twist = 0)
                 polygon(points=[ [bushing_r + wall, -rod_distance - ST],
                                  [wire_y_pos + wall + 2*ST,
-                                   wire_h_pos + bushing_r - lwall -
-                                   strech_support_wall - wire_hole/2 -ST],
+                                  -rod_distance + ST],
                                  [wire_y_pos + 2*ST,
                                     lowest_wire + bushing_r - wire_hole - ST],
                                  [bushing_r + lwall, bushing_r] ] );
@@ -479,26 +480,15 @@ module base_sliding_block_negative(
     //bushing
     translate([0,0,-1])
       cylinder(r=bushing_r - bushing_wall, h=h +2);
+    translate([0,0,-1]) difference() {
+      cylinder(r=bushing_r, h=h +2);
+      translate([-bushing_r - 1, -bushing_r -1, -1])
+        cube([2*bushing_r +2, bushing_wall +1, h+4]);
+    }
     for(i=[0, bushing_l +  bushings_distance]) translate([0,0,i]) {
       translate([0,0,lwall])
         #cylinder(r=bushing_r, h=bushing_l);
-      translate([0,0,2*lwall])
-        #cylinder(r=bushing_r + bushing_wall,
-                 h=bushing_l - 2*lwall - bushing_wall);
-      translate([0,0,lwall + bushing_l - lwall - bushing_wall - ST])
-        #cylinder(r1=bushing_r + bushing_wall,
-                 r2=bushing_r,
-                 h=bushing_wall);
-      translate([0,0,lwall+bushing_l-ST])
-        #cylinder(r1=bushing_r - ST, r2=bushing_r-bushing_wall, h=bushing_wall);
     }
-    translate([0,0,2*lwall + bushing_l])
-      cylinder(r=bushing_r + bushing_wall,
-               h=bushings_distance - 2*lwall - bushing_wall);
-    translate([0,0,bushing_l + bushings_distance - bushing_wall - ST])
-      cylinder(r1=bushing_r + bushing_wall- ST,
-               r2=bushing_r - bushing_wall + ST,
-               h=2*bushing_wall);
 
     //bushing access
     translate([0, -bushing_r + bushing_wall, 0])
