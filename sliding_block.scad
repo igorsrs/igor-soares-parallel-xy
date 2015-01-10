@@ -19,6 +19,7 @@
 
 include <configuration.scad>
 
+/*
 mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -29,7 +30,7 @@ sliding_block_rod_clamp(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-
+*/
 /*
 mirror([1,0,0])
 sliding_block_rod_clamp(
@@ -42,7 +43,6 @@ sliding_block_rod_clamp(
                   BEARING_WIDTH/2 + 1
 );
 */
-/*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
     $fn=64,
@@ -52,7 +52,6 @@ sliding_block_rod_clamp_internal(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-*/
 /*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
@@ -212,9 +211,8 @@ module sliding_block_rod_clamp(
                     wire_y_pos - wall:
                     wire_y_pos;
 
-  screw_wall_pos = (wire_pos_from_bearing_center > 0 ) ?
-                      wire_wall_pos - 2*strech_screw_head_r - wall - ST :
-                      wire_wall_pos;
+  screw_wall_pos = max(wire_h_pos + wire_hole/2 - 2*strech_support_wall -lwall,
+                       -bushing_r - rod_distance);
   screw_wall_h = strech_support_wall + wire_hole/2 + wall;
   strech_screws_pos = lwall + strech_screw_head_r;
   strech_screws_distance = 15;
@@ -248,14 +246,14 @@ module sliding_block_rod_clamp(
         union() {
           //wire contact wall
           translate([wire_wall_pos,
-                     -bushing_r - rod_distance,
+                     screw_wall_pos,
                      0])
             cube([wall, 2*lwall + 2*strech_support_wall, total_h]);
 
           //strech_screws supports
           for(param_supp=[[total_h, 1, hsupp, strech_support_wall + wall] ])
             translate([wire_wall_pos,
-                       -bushing_r - rod_distance,
+                       screw_wall_pos,
                        param_supp[0]])
               mirror([0,0, param_supp[1]])
                 difference()
@@ -281,7 +279,7 @@ module sliding_block_rod_clamp(
               #cylinder(r=strech_screw_r, h=wall -param_supp[2] +1);
           }
           translate([wire_wall_pos,
-                     -bushing_r - rod_distance,
+                     screw_wall_pos,
                      0])
             difference()
           {
@@ -341,7 +339,7 @@ module sliding_block_rod_clamp(
               #linear_extrude(height=wall, convexity = 10, twist = 0)
                 polygon(points=[ [bushing_r + wall, -rod_distance - ST],
                                  [wire_y_pos + wall + 2*ST,
-                                  -rod_distance + ST],
+                                  screw_wall_pos + bushing_r + ST],
                                  [wire_y_pos + 2*ST,
                                     lowest_wire + bushing_r - wire_hole - ST],
                                  [bushing_r + lwall, bushing_r] ] );
