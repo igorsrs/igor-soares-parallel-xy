@@ -43,6 +43,7 @@ sliding_block_rod_clamp(
                   BEARING_WIDTH/2 + 1
 );
 */
+/*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
     $fn=64,
@@ -52,7 +53,8 @@ sliding_block_rod_clamp_internal(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-/*
+*/
+
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
     $fn=64,
@@ -62,7 +64,7 @@ sliding_block_rod_clamp_internal(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
-*/
+
 module sliding_block_rod_clamp_internal(
     wire_clamp=false,
     wall=WALL_WIDTH,

@@ -19,17 +19,17 @@
 
 include <configuration.scad>
 
-HOTEND_POSITION = [ 17, 18];
+HOTEND_POSITION = [50, 8];
 HOTEND_HOLE = 30;
 HOTEND_SCREW_DISTANCE = 25;
 EXTRUDER_SCREWS = 4.5;
 EXTRUDER_SCEWS_NUT_WIDTH = 7.2;
 EXTRUDER_SCEWS_NUT_H = 4;
-X_SCREWS_POSITIONS = [-30, 50];
-Y_SCREWS_POSITIONS = [-30, 50];
+X_SCREWS_POSITIONS = [3, 93];
+Y_SCREWS_POSITIONS = [15, 60];
 BUSHING_HOUSING_SCREW_DIAMETER = 5.4;
 
-xy_car_base($fn=64, extruder_angle=75);
+xy_car_base($fn=64, extruder_angle=90);
 
 module xy_car_base(
   wall=WALL_WIDTH,
@@ -37,7 +37,7 @@ module xy_car_base(
   hsupp=HORIZONTAL_SUPPORT_WALL,
   screws_distance=HOTEND_SCREW_DISTANCE,
   extruder_screw_r=EXTRUDER_SCREWS/2,
-  extruder_screw_nut_r=EXTRUDER_SCEWS_NUT_WIDTH/(2*cos(30)),
+  extruder_screw_nut_r=6.7/(2*cos(30)),
   extruder_screw_nut_h=EXTRUDER_SCEWS_NUT_H,
   x_screws=X_SCREWS_POSITIONS,
   y_screws=Y_SCREWS_POSITIONS,
@@ -55,14 +55,15 @@ module xy_car_base(
       linear_extrude(height=lwall, convexity=10) {
         polygon(
           points=[
-            [-l, y_screws[0]],
-            [l, y_screws[0]],
+            //[-l, y_screws[0]],
+            //[l, y_screws[0]],
             [x_screws[1], -l],
             [x_screws[1], l],
             [l, y_screws[1]],
             [-l, y_screws[1]],
-            [x_screws[0], l],
-            [x_screws[0], -l],
+            [-l,-l]
+            //[x_screws[0], l],
+            //[x_screws[0], -l],
           ],
           paths=[[0,1,2,3,4,5,6,7]],
           convexity=10
@@ -128,7 +129,7 @@ module xy_car_base(
    translate([hotend_pos[0], hotend_pos[1], -1])
       #cylinder(r=hotend_hole_r, h=2*lwall + extruder_screw_nut_h +2);
    translate([hotend_pos[0] + ST, hotend_pos[1] + ST, -1])
-     rotate([0,0,hotend_pos_angle])
+     rotate([0,0,90+0*hotend_pos_angle])
        translate([0,-hotend_hole_r,0])
          #cube([x_screws[1] + y_screws[1], 2*hotend_hole_r,
                 2*lwall + extruder_screw_nut_h +2]);
@@ -154,10 +155,10 @@ module xy_car_base(
     {
         for(i=[-1,1])
           translate([0, i*screws_distance, lwall]) {
-            rotate([0,0,hotend_pos_angle - extruder_angle])
+            rotate([0,0,90 + 30])//hotend_pos_angle - extruder_angle])
               #cylinder(r=extruder_screw_nut_r, h=extruder_screw_nut_h, $fn=6);
             translate([0, -extruder_screw_nut_r*cos(30), 0])
-              rotate([0,0,hotend_pos_angle - extruder_angle])
+              rotate([0,0,0])//hotend_pos_angle - extruder_angle])
                 #cube([x_screws[1] + y_screws[1],
                        2*extruder_screw_nut_r*cos(30) + ST,
                        extruder_screw_nut_h + ST]);
