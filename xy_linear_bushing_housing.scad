@@ -23,15 +23,15 @@ use <linear_bushing_housing.scad>
 
 xy_linear_bushing_housing($fn=64,
                           lwall=3.0,
-                          total_len=105,
-                          vertical_screws_separation=90,
+                          total_len=95,
+                          vertical_screws_separation=80,
                           dual_bushing=true,
                           lwall=3.0);
 /*
 xy_linear_bushing_housing($fn=64,
                           lwall=3.0,
                           total_len=50,
-                          vertical_screws_separation=36,
+                          vertical_screws_separation=35,
                           dual_bushing=false,
                           lwall=3.0);
 */
@@ -73,12 +73,12 @@ module xy_linear_bushing_housing(
         union() {
           translate([-wall-vertical_screw_r, 0, 0])
             cube([2*(wall + vertical_screw_r),
-                  2*wall+ vertical_screw_r,
+                  wall+ vertical_screw_head_r,
                   wall]);
-          translate([0, 2*wall + vertical_screw_r - ST, 0])
+          translate([0, wall + vertical_screw_head_r - ST, 0])
             cylinder(r=wall + vertical_screw_r, h=wall);
         }
-        translate([0, 2*wall + vertical_screw_r - ST, -1])
+        translate([0, wall + vertical_screw_head_r - ST, -1])
           #cylinder(r= vertical_screw_r, h=wall+2);
       }
     }
