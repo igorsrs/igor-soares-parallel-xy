@@ -249,15 +249,15 @@ module sliding_block_rod_clamp(
           //wire contact wall
           translate([wire_wall_pos - 2*lwall - 2*strech_support_wall,
                      screw_wall_pos,
-                     0])
-            cube([2*lwall + 2*strech_support_wall, wall, total_h]);
+                     wall])
+            cube([2*lwall + 2*strech_support_wall, wall, total_h - wall - ST]);
 
           for(i=[0:3])
             translate([wire_wall_pos -
-                        (i/3.0)*(2*lwall + 2*strech_support_wall - wall) - wall,
-                       screw_wall_pos,
+                        (i/3.0)*(2*lwall + 2*strech_support_wall - 2*wall) - 1.5*wall,
+                       screw_wall_pos + wall/2,
                        0])
-              cube([wall, 2*wall, wall]);
+              cylinder(r=wall/2, h=wall);
 
           translate([wire_y_pos - wall,
                      wire_h_pos - wire_hole/2 - wall,
@@ -370,9 +370,9 @@ module sliding_block_rod_clamp(
         mirror([(wire_pos_from_bearing_center >0) ? 1 : 0,0,0])
           union()
       {
-          translate([-wall - 3*wire_hole,0,wall])
+          translate([-wall - 3*wire_hole,0,wall + lwall])
             #cube([2*wire_hole, wall + wire_hole +1, 2*wire_hole]);
-          translate([-2*strech_support_wall - 2*lwall - wire_hole + wall,0,wall])
+          translate([-2*strech_support_wall - 2*lwall - wire_hole + wall,0,wall + lwall])
             #cube([2*wire_hole, wall + wire_hole +1, 2*wire_hole]);
       }
 
