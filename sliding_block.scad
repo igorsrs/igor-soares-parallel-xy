@@ -18,7 +18,7 @@
  */
 
 include <configuration.scad>
-/*
+
 mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -29,8 +29,7 @@ sliding_block_rod_clamp(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-*/
-
+/*
 mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -41,7 +40,7 @@ sliding_block_rod_clamp(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
-
+*/
 /*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
@@ -261,9 +260,11 @@ module sliding_block_rod_clamp(
               cube([wall, 2*wall, wall]);
 
           translate([wire_y_pos - wall,
-                     screw_wall_pos - wall - 2*wire_hole,
+                     wire_h_pos - wire_hole/2 - wall,
                      0])
-            cube([wall, wall + 2*wire_hole + lwall, total_h]);
+            cube([wall,
+                  screw_wall_pos - wire_h_pos + wall + wire_hole,
+                  total_h]);
 
           translate([wire_wall_pos,
                      screw_wall_pos + (wall - lwall),
@@ -365,7 +366,7 @@ module sliding_block_rod_clamp(
             #cube([wall + 2, wire_hole, wire_hole]);
       }
 
-      translate([wire_y_pos, wire_h_pos, 0])
+      translate([wire_y_pos, screw_wall_pos -1, 0])
         mirror([(wire_pos_from_bearing_center >0) ? 1 : 0,0,0])
           union()
       {
