@@ -18,13 +18,17 @@
  */
 include <configuration.scad>
 
-//tensioner($fn=64);
-screw_hosing($fn=64);
+tensioner($fn=64);
+//screw_hosing($fn=64);
 
 module tensioner(
-    strech_support_width=2*WALL_WIDTH+ 5.0 - 0.4,
-    width= 13,
+    strech_support_width=2*WALL_WIDTH+ 4.0 - 0.4,
+    width= 11,
+    vmin=0.5,
+    hsupp=0.4 + ST,
     screw_r=5.0/2,
+    screw_nut_width=6.9,
+    screw_nut_h=3,
     wire_grip_w=2.5,
     wire_grip_r1=(2*WALL_WIDTH + 5.0 - 0.4)/2 - 1.5,
     wire_grip_r2=(2*WALL_WIDTH + 5.0 - 0.4)/2  + 0,
@@ -34,6 +38,11 @@ module tensioner(
   difference() {
     union() {
       cube([strech_support_width - wire_grip_w,
+            strech_support_width,
+            width]);
+
+      translate([strech_support_width -vmin + 0.1,0,0])
+      cube([vmin,
             strech_support_width,
             width]);
 
@@ -61,19 +70,22 @@ module tensioner(
       }
     }
     translate([strech_support_width/2, strech_support_width/2, -1])
+      #cylinder(r=screw_nut_width/(2*cos(30)), h=screw_nut_h +1, $fn=6);
+    translate([strech_support_width/2, strech_support_width/2,
+               screw_nut_h + hsupp])
       #cylinder(r=screw_r, h=width +2);
   }
 }
 
 module screw_hosing(
-  screw_r=5.0/2,
-  screw_nut_w=8.1,
-  screw_nut_h=3.5,
+  screw_r=4.4/2,
+  screw_nut_w=6.9,
+  screw_nut_h=3,
   screw_nut_access_hole=10.5,
   wall=4.5,
   lower_wall=2,
   grip_hole=0.8,
-  h=9)
+  h=5.1)
 {
   nut_r = screw_nut_w/sqrt(3);
   n_g = floor( 3.1415*(screw_r + wall)/(2*grip_hole) );

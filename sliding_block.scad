@@ -19,6 +19,7 @@
 
 include <configuration.scad>
 
+/*
 mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -29,7 +30,7 @@ sliding_block_rod_clamp(
     second_wire_h=1.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   3*BEARING_WIDTH/2 + 1.5
 );
-/*
+*/
 mirror([1,0,0])
 sliding_block_rod_clamp(
     wire_clamp=true,
@@ -40,7 +41,7 @@ sliding_block_rod_clamp(
     second_wire_h=0.5*ROD_HOLE_DIAMETER + LIGHT_WALL_WIDTH +
                   BEARING_WIDTH/2 + 1
 );
-*/
+
 /*
 sliding_block_rod_clamp_internal(
     wire_clamp=true,
