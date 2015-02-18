@@ -22,7 +22,7 @@ include <configuration.scad>
 translate([14,0, 2*WALL_WIDTH +BEARING_WIDTH])
 motor_bracket($fn=64,
               bearing_screw_nut_width=BEARING_SCREW_NUT_WIDTH + 14,
-              bearing_screw_h_pos=LIGHT_WALL_WIDTH);
+              bearing_screw_h_pos=WALL_WIDTH);
 
 module motor_bracket(
     lwall=LIGHT_WALL_WIDTH,
@@ -32,7 +32,7 @@ module motor_bracket(
     bearing_screw_nut_width=BEARING_SCREW_NUT_WIDTH,
     bearing_screw_h_pos=LIGHT_WALL_WIDTH,
     motor_screw_r=MOTOR_SCREW_DIAMETER/2,
-    motor_screw_head_r=10/2,
+    motor_screw_head_r=12/2,
     motor_size=MOTOR_SIZE,
     motor_screw_mount=MOTOR_SCREW_MOUNT,
     motor_support_screw_r=MOTOR_SUPPORT_SCREW_DIAMETER/2,
@@ -61,14 +61,20 @@ module motor_bracket(
                      -i*motor_mount_r*cos(45) - motor_screw_r - wall,
                      0])
      {
-       cube([2*wall+2*bearing_screw_r + motor_screw_head_r,
+       cube([wall+2*bearing_screw_r + motor_screw_head_r,
              2*motor_screw_r + 2*wall,
              wall]);
-
+     }
+      for (i=[1]) for (j=[1,0])
+        translate([motor_pos,0,0]) mirror([j,0,0])
+          translate([motor_mount_r*cos(45),
+                     -i*motor_mount_r*cos(45) - motor_screw_r - wall,
+                     0])
+     {
        translate([motor_screw_head_r,0, ST])
-          cube([2*wall+2*bearing_screw_r,
-                2*motor_screw_r + 2*wall,
-                lwall + bearing_screw_h_pos + 2*bearing_screw_r]);
+          cube([wall+2*bearing_screw_r,
+                2*motor_screw_r + 2*wall + 2*motor_mount_r*cos(45),
+                wall + bearing_screw_h_pos + 2*bearing_screw_r]);
      }
 
       //motor mount
@@ -87,7 +93,12 @@ module motor_bracket(
                    0,
                    bearing_screw_r + bearing_screw_h_pos + ST])
           rotate([90,0,0])
-            #cylinder(r=bearing_screw_r, h=60, center=true);
+    {
+      #cylinder(r=bearing_screw_r, h=60, center=true);
+      translate([bearing_screw_r, 0, 0])
+        #cube([bearing_screw_r + wall + 1, 2*bearing_screw_r, 2*motor_mount_r],
+              center=true);
+    }
     //motor mount
     translate([motor_pos,0, -1]) {
       #cylinder(r=motor_central_r, h=h+2);
