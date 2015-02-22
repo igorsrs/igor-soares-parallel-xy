@@ -21,6 +21,7 @@ include <configuration.scad>
 //use <linear_bushing_housing.scad>
 
 
+/*
 xy_linear_bushing_housing($fn=64,
                           lwall=2.0,
                           wall=3.0,
@@ -28,14 +29,18 @@ xy_linear_bushing_housing($fn=64,
                           vertical_screws_separation=80,
                           dual_bushing=true,
                           housing_screw_pos=12 + 3 + 3.7/2 - 0.7);
-/*
+*/
+
 xy_linear_bushing_housing($fn=64,
-                          lwall=3.0,
-                          total_len=50,
+                          lwall=2.0,
+                          wall=3.0,
+                          total_len=47,
                           vertical_screws_separation=35,
                           dual_bushing=false,
-                          lwall=3.0);
-*/
+                          housing_screw_pos=6,
+                          vertical_support_pos=9,
+                          vertical_support_h=6.25);
+
 
 module xy_linear_bushing_housing(
     wall=WALL_WIDTH,
@@ -88,7 +93,11 @@ module xy_linear_bushing_housing(
                      (wall + vertical_screw_r) +1,
                      vertical_support_h +2]);
           }
-
+      }
+      for(i=dual_bushing?[-1,1]:[1])
+        translate([total_len/2 - i*vertical_screws_separation/2, bushing_r, 0])
+          union()
+      {
         translate([-wall-vertical_screw_r, 0, 0])
           translate([i*(housing_screw_pos - wall -housing_screw_r),
                      -bushing_wall, ST])
@@ -113,7 +122,7 @@ module xy_linear_bushing_housing(
         #cylinder(r= vertical_screw_r, h=vertical_support_h+2);
     }
 
-    for(i=[-1,1])
+    for(i=dual_bushing?[-1,1]:[1])
       translate([total_len/2 - i*vertical_screws_separation/2 +
                    i*(housing_screw_pos - wall -housing_screw_r),
                  0,
